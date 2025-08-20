@@ -3,13 +3,13 @@ import RegisterForm from "@/features/auth/RegisterForm";
 import { useState } from "react";
 import ReactCardFlip from "react-card-flip";
 
-function Login() {
+function LoginPage() {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const handleClick = () => setIsFlipped(!isFlipped);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full">
+    <div className="flex flex-col items-center justify-center h-screen">
       <ReactCardFlip
         isFlipped={isFlipped}
         flipDirection="horizontal"
@@ -27,4 +27,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default LoginPage;
