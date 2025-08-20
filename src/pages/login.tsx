@@ -9,7 +9,7 @@ function Login() {
   const handleClick = () => setIsFlipped(!isFlipped);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className="flex flex-col items-center justify-center h-full">
       <ReactCardFlip
         isFlipped={isFlipped}
         flipDirection="horizontal"

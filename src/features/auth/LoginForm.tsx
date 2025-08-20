@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -28,18 +27,21 @@ function LoginForm({ isFlipped }: LoginFormProps) {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm<FormData>();
 
   /*     const navigate = useNavigate();*/
   const authStore = useAuthStore();
-  const [isLoading] = useState(false);
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    console.log(data);
-    //setIsLoading(true);
-    //await authStore.login(data);
-    //setIsLoading(false);
+    try {
+      console.log(data);
+      //setIsLoading(true);
+      //await authStore.login(data);
+      //setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleClickFlipped = () => {
@@ -128,7 +130,7 @@ function LoginForm({ isFlipped }: LoginFormProps) {
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button onClick={handleSubmit(onSubmit)} className="w-full">
-          {isLoading ? "Loading..." : "Login"}
+          {authStore.isLoading ? "Loading..." : "Login"}
         </Button>
         {/* <Button variant="outline" className="w-full">
           Login with Google
