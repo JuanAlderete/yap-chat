@@ -1,8 +1,11 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import ProtectedRoute from './features/auth/ProtectedRoute';
-import LoginPage from './pages/login';
-import DashboardPage from './pages/Dashboard';
-import NotFoundPage from './pages/NotFoundPage';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./features/auth/ProtectedRoute";
+import LoginPage from "./pages/Login";
+import NotFoundPage from "./pages/NotFoundPage";
+import ChatLayout from "./components/layout/ChatLayout";
+import ChatWindow from "./features/chat/ChatWindow";
+import Layout from "./components/layout/Layout";
+import EmptyChatState from "./features/chat/EmptyChatState";
 
 function App() {
   return (
@@ -16,14 +19,17 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <DashboardPage />
-              {/* <ChatLayout /> */}
+              <Layout>
+                <ChatLayout />
+              </Layout>
             </ProtectedRoute>
           }
         >
-          {/* Rutas anidadas del chat */}
-          {/* <Route index element={<ChatDashboard />} /> */}
-          {/* <Route path=":conversationId" element={<ChatRoom />} /> */}
+          {/* Ruta por defecto - sin chat seleccionado */}
+          <Route index element={<EmptyChatState />} />
+
+          {/* Chat específico */}
+          <Route path="chat/:conversationId" element={<ChatWindow />} />
         </Route>
 
         <Route
