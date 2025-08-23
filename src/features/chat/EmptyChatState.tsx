@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import NewChat from "./components/NewChat";
+import NewChat from "../../components/common/NewChat";
 
 function EmptyChatState() {
   const [openDialog, setOpenDialog] = useState(false);

@@ -1,16 +1,77 @@
-function ChatMenuItem({ index }: { index: number }) {
+// src/features/chat/components/ChatMenuItem.tsx
+import type { Conversation } from "@/types/chat.types";
+import { useChatStore } from "@/stores/chatStore";
+import { differenceInMinutes, differenceInHours, format } from "date-fns";
+import { es } from "date-fns/locale";
+
+interface ChatMenuItemProps {
+  conversation: Conversation;
+  searchQuery?: string;
+}
+
+function ChatMenuItem({ conversation, searchQuery = "" }: ChatMenuItemProps) {
+  const activeConversationId = useChatStore(
+    (state) => state.activeConversationId
+  );
+  const isActive = activeConversationId === conversation.id;
+
+  // Función para resaltar texto que coincide con la búsqueda
+  const highlightText = (text: string, query: string) => {
+    if (!query) return text;
+
+    const parts = text.split(new RegExp(`(${query})`, "gi"));
+    return parts.map((part, i) =>
+      part.toLowerCase() === query.toLowerCase() ? (
+        <mark key={i} className="bg-orange-300 dark:bg-orange-800 rounded">
+          {part}
+        </mark>
+      ) : (
+        part
+      )
+    );
+  };
+
+  // Formatear la fecha de última actualización
+  const formatTime = (date: Date): string => {
+    const mins = differenceInMinutes(new Date(), date);
+
+    if (mins < 1) return "now";
+    if (mins < 60) return `${mins}m ago`;
+
+    const hours = differenceInHours(new Date(), date);
+    if (hours < 24) return `${hours}h ago`;
+    return format(date, "P", { locale: es });
+  };
+
   return (
     <div
-      className="flex items-center gap-2 p-2 bg-sidebar hover:bg-[#E6D6CA] rounded-md cursor-pointer"
+      className={`flex items-center gap-2 p-3 rounded-md cursor-pointer transition-colors duration-200 ${
+        isActive ? "bg-[#E6D6CA] shadow-md" : "bg-sidebar hover:bg-[#E6D6CA]"
+      }`}
     >
-      <div className="rounded-full bg-emerald-200 px-2 py-1">
-        <div className="text-xs font-medium">Online</div>
-      </div>
-      <div className="flex-1 text-sm">
-        <div className="font-medium">Chat {index + 1}</div>
-        <div className="text-muted-foreground">
-          <span className="font-medium">Online</span> for 10 minutes
+      <div className="flex-shrink-0">
+        <div className="rounded-full bg-emerald-200 px-2 py-1">
+          <div className="text-xs font-medium">
+            {conversation.name.charAt(0).toUpperCase()}
+          </div>
         </div>
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <div className="font-medium text-sm truncate">
+            {highlightText(conversation.name, searchQuery)}
+          </div>
+          <div className="text-xs text-muted-foreground flex-shrink-0 ml-2">
+            {formatTime(conversation.updatedAt)}
+          </div>
+        </div>
+
+        {conversation.lastMessage && (
+          <div className="text-xs text-muted-foreground truncate">
+            {highlightText(conversation.lastMessage, searchQuery)}
+          </div>
+        )}
       </div>
     </div>
   );

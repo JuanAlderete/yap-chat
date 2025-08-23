@@ -1,35 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
-import type { Message } from "@/types/chat.types";
 import { useParams } from "react-router-dom";
 import ChatBubble from "./components/ChatBubble";
+import { useChatStore } from "@/stores/chatStore";
+import { useEffect, useState } from "react";
+import type { Conversation } from "@/types/chat.types";
 
 function ChatWindow() {
   const { conversationId } = useParams();
   const isMobile = useIsMobile();
   const currentUserId: string = "1";
+  const { activeConversationId, currentConversation } = useChatStore();
 
-  const messages: Message[] = [
-    {
-      id: "1",
-      userId: "1",
-      content: "Hello, how are you?",
-      createdAt: new Date(),
-    },
-    {
-      id: "2",
-      userId: "2",
-      content: "I'm fine, thanks!",
-      createdAt: new Date(),
-    },
-    {
-      id: "3",
-      userId: "1",
-      content: "I'm good too, thanks!",
-      createdAt: new Date(),
-    },
-  ];
+  const [conversation, setConversation] = useState<Conversation>();
+
+  useEffect(() => {
+    if (!conversationId) return;
+    const conversation = currentConversation(conversationId);
+    if (!conversation) return;
+    setConversation(conversation);
+    console.log("conversation", conversation);
+  }, [activeConversationId]);
 
   return (
     <div
@@ -38,7 +30,7 @@ function ChatWindow() {
       }`}
     >
       <header className="flex items-center justify-between px-4 py-2 bg-sidebar rounded-t-lg rounded-b-xs shadow-sm">
-        <p className="text-xl font-medium">Chat {conversationId}</p>
+        <p className="text-xl font-medium">{conversation?.name}</p>
         {/* Botón de acciones */}
         {/* <div className="flex items-center gap-2">
           <Button className="rounded-full bg-black p-5 hover:bg-red-500"></Button>
@@ -46,8 +38,11 @@ function ChatWindow() {
         </div> */}
       </header>
       <div className="flex-1 flex flex-col w-full p-4">
-        {messages.map((message) => (
-          <div className={`${currentUserId === message.userId ? "ml-auto" : ""}`} key={message.id}>
+        {conversation?.messages.map((message) => (
+          <div
+            className={`${currentUserId === message.userId ? "ml-auto" : ""}`}
+            key={message.id}
+          >
             <ChatBubble message={message} />
           </div>
         ))}

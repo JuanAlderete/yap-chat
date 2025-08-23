@@ -1,5 +1,4 @@
 import ChatSidebar from "@/features/chat/ChatSidebar";
-import ChatWindow from "@/features/chat/ChatWindow";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useChatStore } from "@/stores/chatStore";
 import { useEffect } from "react";
@@ -19,8 +18,6 @@ function ChatLayout() {
   useEffect(() => {
     if (conversationId && activeConversationId !== conversationId) {
       setActiveConversation(conversationId);
-    } else {
-      setActiveConversation(null);
     }
   }, [conversationId, setActiveConversation]);
 
@@ -30,8 +27,6 @@ function ChatLayout() {
         isMobile && hasActiveChat ? "m-0" : "my-2 mx-4"
       }`}
     >
-      {/* Sidebar - oculto en mobile cuando hay chat activo */}
-      {/* TODO: agregar scroll-snap-type: x mandatory para que el sidebar se pueda desplazar */}
       <div
         className={`${isMobile ? "w-full" : "w-80 min-w-60 max-w-80"} ${
           isMobile && hasActiveChat ? "hidden" : "flex"
