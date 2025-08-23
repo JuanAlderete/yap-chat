@@ -33,7 +33,7 @@ function ChatWindow() {
 
   return (
     <div
-      className={`flex flex-col h-full ${
+      className={`flex flex-col h-full w-full ${
         isMobile ? "rounded-none" : "rounded-lg"
       }`}
     >

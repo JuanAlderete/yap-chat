@@ -25,10 +25,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* Ruta por defecto - sin chat seleccionado */}
           <Route index element={<EmptyChatState />} />
-
-          {/* Chat específico */}
           <Route path="chat/:conversationId" element={<ChatWindow />} />
         </Route>
 

@@ -12,11 +12,11 @@ function ChatSidebar() {
   };
 
   return (
-    <div className="flex flex-col gap-3 overflow-y-auto max-h-[calc(100vh-48px)] customScrollbar pr-2 mt-8">
+    <div className="flex flex-col gap-3 overflow-y-auto max-h-[calc(100vh-64px)] customScrollbar pr-2 mt-12 w-full">
       {/* Lista de chats */}
       {Array.from({ length: 20 }).map((_, index) => (
-        <Link to={`/chat/${index+1}`} onClick={() => handleClick(index)}>
-          <ChatMenuItem key={index} index={index} />
+        <Link key={index} to={`/chat/${index+1}`} onClick={() => handleClick(index)}>
+          <ChatMenuItem index={index} />
         </Link>
       ))}
     </div>
