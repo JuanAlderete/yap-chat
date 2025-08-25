@@ -20,7 +20,6 @@ function ChatWindow() {
     const conversation = currentConversation(conversationId);
     if (!conversation) return;
     setConversation(conversation);
-    console.log("conversation", conversation);
   }, [activeConversationId]);
 
   return (

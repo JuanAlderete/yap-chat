@@ -1,6 +1,6 @@
 // src/features/chat/components/ChatMenuItem.tsx
-import type { Conversation } from "@/types/chat.types";
 import { useChatStore } from "@/stores/chatStore";
+import type { ChatStore, Conversation } from "@/types/chat.types";
 import { differenceInMinutes, differenceInHours, format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -11,7 +11,7 @@ interface ChatMenuItemProps {
 
 function ChatMenuItem({ conversation, searchQuery = "" }: ChatMenuItemProps) {
   const activeConversationId = useChatStore(
-    (state) => state.activeConversationId
+    (state: ChatStore) => state.activeConversationId
   );
   const isActive = activeConversationId === conversation.id;
 

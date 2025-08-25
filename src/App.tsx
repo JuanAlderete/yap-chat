@@ -6,10 +6,24 @@ import ChatLayout from "./components/layout/ChatLayout";
 import ChatWindow from "./features/chat/ChatWindow";
 import Layout from "./components/layout/Layout";
 import EmptyChatState from "./features/chat/EmptyChatState";
+import { useAuthStore } from "./stores/authStore";
+import { useEffect } from "react";
+
+// Componente para inicializar el estado de autenticación
+function AuthInitializer() {
+  const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
+
+  return null;
+}
 
 function App() {
   return (
     <BrowserRouter>
+      <AuthInitializer />
       <Routes>
         {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />

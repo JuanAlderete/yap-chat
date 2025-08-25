@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 type FormData = {
   email: string;
@@ -30,15 +31,14 @@ function LoginForm({ isFlipped }: LoginFormProps) {
     reset,
   } = useForm<FormData>();
 
-  /*     const navigate = useNavigate();*/
+  const navigate = useNavigate();
   const authStore = useAuthStore();
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
     try {
       console.log(data);
-      //setIsLoading(true);
-      //await authStore.login(data);
-      //setIsLoading(false);
+      await authStore.login(data);
+      navigate("/");
     } catch (error) {
       console.log(error);
     }

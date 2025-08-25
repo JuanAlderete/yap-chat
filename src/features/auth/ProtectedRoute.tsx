@@ -15,7 +15,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
   
   // Si no está autenticado, redirigir
-  if (isAuthenticated) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   

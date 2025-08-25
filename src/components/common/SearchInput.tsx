@@ -15,7 +15,7 @@ function SearchInput({
   placeholder = "Search chats...",
 }: SearchInputProps) {
   const [localValue, setLocalValue] = useState("");
-  const { searchQuery, setSearchQuery } = useChatStore();
+  const { setSearchQuery } = useChatStore();
 
   // Debounce para evitar búsquedas excesivas
   useEffect(() => {

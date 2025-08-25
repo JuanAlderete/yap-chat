@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useNavigate } from "react-router-dom";
 
 type FormData = {
   email: string;
@@ -31,18 +32,23 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm<FormData>();
 
-  /*     const navigate = useNavigate();*/
+  const navigate = useNavigate();
   const authStore = useAuthStore();
-  const [isLoading] = useState(false);
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
     console.log(data);
-    //setIsLoading(true);
     //await authStore.register(data);
-    //setIsLoading(false);
+    // try {
+    //   await authStore.register(data);
+    //   navigate("/");
+    // } catch (error) {
+    //   console.error("Registration failed:", error);
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const handleClickFlipped = () => {
@@ -141,8 +147,8 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
               <Checkbox
                 id="terms"
                 {...register("terms", {
-                  required: 'You must accept the terms and conditions.',
-                })} 
+                  required: "You must accept the terms and conditions.",
+                })}
               />
               <Label htmlFor="terms">Accept terms and conditions</Label>
             </div>
@@ -154,7 +160,7 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button onClick={handleSubmit(onSubmit)} className="w-full">
-          {isLoading ? "Loading..." : "Register"}
+          {authStore.isLoading ? "Loading..." : "Register"}
         </Button>
       </CardFooter>
     </Card>
