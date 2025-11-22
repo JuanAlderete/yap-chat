@@ -7,19 +7,40 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuBadge
+  SidebarMenuBadge,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessagesSquare } from "lucide-react"
+import { MessagesSquare } from "lucide-react";
+import { useAuthStore } from "@/stores/authStore";
+import { LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useChatStore } from "@/stores/chatStore";
+import { useEffect } from "react";
 
 function AppSidebar() {
+  const logout = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
+  const { filteredConversations, initialize } = useChatStore();
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   const items = [
     {
       title: "Chats",
       url: "#",
       icon: MessagesSquare,
-    }
+    },
   ];
+
+  const displayConversations =
+    filteredConversations.length > 0 ? filteredConversations : [];
 
   return (
     <Sidebar>
@@ -41,22 +62,36 @@ function AppSidebar() {
                     <span className="text-lg">{item.title}</span>
                   </a>
                 </SidebarMenuButton>
-                <SidebarMenuBadge>24</SidebarMenuBadge>
+                <SidebarMenuBadge>
+                  {displayConversations.length}
+                </SidebarMenuBadge>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center gap-4 px-2">
-          <Avatar className="rounded-lg">
-            <AvatarImage
-              src="https://github.com/evilrabbit.png"
-              alt="@evilrabbit"
-            />
-            <AvatarFallback>ER</AvatarFallback>
-          </Avatar>
-          <h2 className="text-base font-medium">Evil Rabbit</h2>
+        <div className="flex items-center justify-between px-2">
+          <div className="flex items-center gap-4">
+            <Avatar className="rounded-lg">
+              <AvatarImage
+                src={user?.avatar || "https://github.com/shadcn.png"}
+                alt={user?.name}
+              />
+              <AvatarFallback>
+                {user?.name?.charAt(0).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <h2 className="text-base font-medium">{user?.name || "Usuario"}</h2>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="p-2 hover:bg-sidebar-accent rounded-md transition-colors cursor-pointer"
+            title="Cerrar sesión"
+          >
+            <LogOut className="h-5 w-5" />
+          </button>
         </div>
       </SidebarFooter>
     </Sidebar>

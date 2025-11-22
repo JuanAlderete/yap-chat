@@ -17,7 +17,6 @@ function SearchInput({
   const [localValue, setLocalValue] = useState("");
   const { setSearchQuery } = useChatStore();
 
-  // Debounce para evitar búsquedas excesivas
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchQuery(localValue);

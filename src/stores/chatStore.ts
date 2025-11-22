@@ -1,235 +1,133 @@
-// src/stores/chatStore.ts
-import type { ChatStore } from "@/types/chat.types";
+import { conversationService } from "@/services/conversation.service";
+import { messageService } from "@/services/message.service";
+import type { ChatStore, Conversation, Message } from "@/types/chat.types";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
-export const useChatStore = create<ChatStore>()(
-  persist(
-    (set, get) => ({
-      conversations: [
-        {
-          id: "1",
-          name: "Conversación sobre React",
-          lastMessage: "¿Cómo implementar hooks?",
-          updatedAt: new Date(),
-          messages: [
-            {
-              id: "1",
-              userId: "1",
-              content: "Hello, how are you?",
-              createdAt: new Date(),
-            },
-            {
-              id: "2",
-              userId: "2",
-              content: "I'm fine, thanks!",
-              createdAt: new Date(),
-            },
-            {
-              id: "3",
-              userId: "1",
-              content: "I'm good too, thanks!",
-              createdAt: new Date(),
-            },
-          ],
-        },
-        {
-          id: "2",
-          name: "Planning del proyecto",
-          lastMessage: "Necesitamos revisar el cronograma",
-          updatedAt: new Date(),
-          messages: [
-            {
-              id: "1",
-              userId: "1",
-              content: "Hello, how are you?",
-              createdAt: new Date(),
-            },
-            {
-              id: "2",
-              userId: "2",
-              content: "I'm fine, thanks!",
-              createdAt: new Date(),
-            },
-            {
-              id: "3",
-              userId: "1",
-              content: "I'm good too, thanks!",
-              createdAt: new Date(),
-            },
-          ],
-        },
-        {
-          id: "3",
-          name: "Dudas sobre TypeScript",
-          lastMessage: "Los tipos genéricos son confusos",
-          updatedAt: new Date(),
-          messages: [
-            {
-              id: "1",
-              userId: "1",
-              content: "Hello, how are you?",
-              createdAt: new Date(),
-            },
-            {
-              id: "2",
-              userId: "2",
-              content: "I'm fine, thanks!",
-              createdAt: new Date(),
-            },
-            {
-              id: "3",
-              userId: "1",
-              content: "I'm good too, thanks!",
-              createdAt: new Date(),
-            },
-          ],
-        },
-        {
-          id: "4",
-          name: "Chat con el equipo",
-          lastMessage: "¿Vamos a almorzar juntos?",
-          updatedAt: new Date(),
-          messages: [
-            {
-              id: "1",
-              userId: "1",
-              content: "Hello, how are you?",
-              createdAt: new Date(),
-            },
-            {
-              id: "2",
-              userId: "2",
-              content: "I'm fine, thanks!",
-              createdAt: new Date(),
-            },
-            {
-              id: "3",
-              userId: "1",
-              content: "I'm good too, thanks!",
-              createdAt: new Date(),
-            },
-          ],
-        },
-        {
-          id: "5",
-          name: "Soporte técnico",
-          lastMessage: "El error persiste en producción",
-          updatedAt: new Date(),
-          messages: [
-            {
-              id: "1",
-              userId: "1",
-              content: "Hello, how are you?",
-              createdAt: new Date(),
-            },
-            {
-              id: "2",
-              userId: "2",
-              content: "I'm fine, thanks!",
-              createdAt: new Date(),
-            },
-            {
-              id: "3",
-              userId: "1",
-              content: "I'm good too, thanks!",
-              createdAt: new Date(),
-            },
-          ],
-        },
-        // Estas son de testing
-        ...Array.from({ length: 15 }, (_, i) => ({
-          id: (i + 6).toString(),
-          name: `Chat ${i + 6}`,
-          lastMessage: `Mensaje de prueba ${i + 1}`,
-          updatedAt: new Date(),
-          messages: [
-            {
-              id: "1",
-              userId: "1",
-              content: "Hello, how are you?",
-              createdAt: new Date(),
-            },
-            {
-              id: "2",
-              userId: "2",
-              content: "I'm fine, thanks!",
-              createdAt: new Date(),
-            },
-            {
-              id: "3",
-              userId: "1",
-              content: "I'm good too, thanks!",
-              createdAt: new Date(),
-            },
-          ],
-        })),
-      ],
-      activeConversationId: null,
-      messages: {},
-      isLoading: false,
-      searchQuery: "",
-      filteredConversations: [],
+export const useChatStore = create<ChatStore>((set, get) => ({
+  conversations: [],
+  activeConversationId: null,
+  messages: {},
+  isLoading: false,
+  searchQuery: "",
+  filteredConversations: [],
 
-      setSearchQuery: (query: string) => {
-        set({ searchQuery: query });
-        const { conversations } = get();
+  // Cargar conversaciones desde el backend
+  loadConversations: async () => {
+    const state = get();
 
-        if (!query.trim()) {
-          set({ filteredConversations: conversations });
-          return;
-        }
+    if (state.isLoading) return;
 
-        const filtered = conversations.filter(
-          (conversation) =>
-            conversation.name.toLowerCase().includes(query.toLowerCase()) ||
-            conversation.lastMessage?.toLowerCase().includes(query.toLowerCase())
-        );
-
-        set({ filteredConversations: filtered });
-      },
-
-      setActiveConversation: (id: string | null) => {
-        set({ activeConversationId: id });
-      },
-
-      sendMessage: (message: string) => {
-        // TODO: enviar mensaje
-        console.log("sendMessage", message);
-      },
-
-      loadConversations: () => {
-        // TODO: cargar conversaciones desde API
-        const { conversations } = get();
-        set({ filteredConversations: conversations });
-        console.log("loadConversations");
-      },
-
-      loadMessages: (conversationId: string) => {
-        // TODO: cargar mensajes
-        console.log("loadMessages", conversationId);
-      },
-
-      // Obtener conversación actual
-      currentConversation: (conversationId: string) => {
-        const { conversations } = get();
-        return conversations.find(
-          (conversation) => conversation.id === conversationId
-        );
-      },
-
-      // Inicializar chats filtrados
-      initialize: () => {
-        const { conversations } = get();
-        set({ filteredConversations: conversations });
-      },
-    }),
-    {
-      name: "chat-storage",
-      partialize: (state) => ({ 
-        activeConversationId: state.activeConversationId,
-        searchQuery: state.searchQuery 
-      }),
+    set({ isLoading: true });
+    try {
+      const conversations = await conversationService.getMyConversations();
+      set({
+        conversations,
+        filteredConversations: conversations,
+        isLoading: false,
+      });
+    } catch (error) {
+      console.error("Error loading conversations:", error);
+      set({ isLoading: false });
     }
-  )
-);
+  },
+
+  // Cargar mensajes de una conversación
+  loadMessages: async (
+    conversationId: string,
+    forceReload: boolean = false
+  ) => {
+    const state = get();
+
+    if (state.isLoading && !forceReload) return;
+
+    if (!forceReload && state.messages[conversationId]?.length > 0) {
+      console.log("Messages already loaded for:", conversationId);
+      return;
+    }
+
+    set({ isLoading: true });
+    try {
+      const response = await messageService.getMessages(conversationId);
+      set((state) => ({
+        messages: {
+          ...state.messages,
+          [conversationId]: response.messages,
+        },
+        isLoading: false,
+      }));
+    } catch (error) {
+      console.error("Error loading messages:", error);
+      set({ isLoading: false });
+    }
+  },
+
+  // Enviar mensaje
+  sendMessage: async (content: string) => {
+    const { activeConversationId } = get();
+    if (!activeConversationId) return;
+
+    try {
+      const newMessage = await messageService.sendMessage(
+        activeConversationId,
+        content
+      );
+
+      set((state) => ({
+        messages: {
+          ...state.messages,
+          [activeConversationId]: [
+            ...(state.messages[activeConversationId] || []),
+            newMessage,
+          ],
+        },
+      }));
+
+      get().loadConversations();
+    } catch (error) {
+      console.error("Error sending message:", error);
+      throw error;
+    }
+  },
+
+  setActiveConversation: (id: string | null) => {
+    if (!id) {
+      set({ activeConversationId: null });
+      return;
+    }
+
+    set({ activeConversationId: id });
+
+    get().loadMessages(id);
+  },
+
+  setSearchQuery: (query: string) => {
+    set({ searchQuery: query });
+    const { conversations } = get();
+
+    if (!query.trim()) {
+      set({ filteredConversations: conversations });
+      return;
+    }
+
+    const filtered = conversations.filter(
+      (conversation) =>
+        conversation.name?.toLowerCase().includes(query.toLowerCase()) ||
+        conversation.lastMessage?.toLowerCase().includes(query.toLowerCase()) ||
+        conversation.otherUser?.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    set({ filteredConversations: filtered });
+  },
+
+  currentConversation: (conversationId: string) => {
+    const { conversations } = get();
+    return conversations.find((conv) => conv._id === conversationId);
+  },
+
+  initialize: () => {
+    const state = get();
+    if (state.conversations.length === 0 && !state.isLoading) {
+      get().loadConversations();
+    }
+  },
+}));

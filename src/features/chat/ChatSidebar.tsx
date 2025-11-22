@@ -1,28 +1,31 @@
 import { Link } from "react-router-dom";
 import ChatMenuItem from "./components/ChatMenuItem";
 import { useChatStore } from "@/stores/chatStore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 function ChatSidebar() {
-  const { 
-    filteredConversations, 
+  const {
+    filteredConversations,
     searchQuery,
     setActiveConversation,
-    initialize 
+    initialize,
   } = useChatStore();
 
-  // Inicializar las conversaciones cuando se crea el componente
+  const hasInitialized = useRef(false);
+
   useEffect(() => {
-    initialize();
-  }, [initialize]);
+    if (!hasInitialized.current) {
+      initialize();
+      hasInitialized.current = true;
+    }
+  }, []);
 
   const handleClick = (conversationId: string) => {
     setActiveConversation(conversationId);
   };
 
-  const displayConversations = filteredConversations.length > 0 
-    ? filteredConversations 
-    : [];
+  const displayConversations =
+    filteredConversations.length > 0 ? filteredConversations : [];
 
   return (
     <div className="flex flex-col gap-3 overflow-y-auto max-h-[calc(100vh-64px)] customScrollbar pr-2 mt-12 w-full">
@@ -34,15 +37,12 @@ function ChatSidebar() {
       )}
 
       {displayConversations.map((conversation) => (
-        <Link 
-          key={conversation.id} 
-          to={`/chat/${conversation.id}`} 
-          onClick={() => handleClick(conversation.id)}
+        <Link
+          key={conversation._id}
+          to={`/chat/${conversation._id}`}
+          onClick={() => handleClick(conversation._id)}
         >
-          <ChatMenuItem 
-            conversation={conversation}
-            searchQuery={searchQuery}
-          />
+          <ChatMenuItem conversation={conversation} searchQuery={searchQuery} />
         </Link>
       ))}
     </div>

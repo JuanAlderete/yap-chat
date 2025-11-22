@@ -1,11 +1,38 @@
 import type { Message } from "@/types/chat.types";
+import { format } from "date-fns";
 
-function ChatBubble({ message }: { message: Message }) {
+interface ChatBubbleProps {
+  message: Message;
+  isOwnMessage: boolean;
+}
+
+function ChatBubble({ message, isOwnMessage }: ChatBubbleProps) {
+  // Obtener el nombre del remitente (si viene POPULATE)
+  const senderName =
+    typeof message.senderId === "object" ? message.senderId.name : "Usuario";
+
+  const messageTime = message.createdAt
+    ? format(new Date(message.createdAt), "HH:mm")
+    : "";
+
   return (
-    <div className="flex flex-col gap-2 p-2 rounded-md w-fit bg-sidebar text-black shadow-md">
-      <p className="text-sm align-self-end text-popover-foreground">{message.content}</p>
-      <p className="text-black text-right text-[10px]">
-        {message.createdAt.getHours()}:{message.createdAt.getMinutes()}
+    <div
+      className={`flex flex-col gap-1 p-3 rounded-lg w-fit max-w-md mb-2 shadow-md ${
+        isOwnMessage
+          ? "bg-primary text-primary-foreground ml-auto"
+          : "bg-sidebar text-foreground"
+      }`}
+    >
+      {!isOwnMessage && (
+        <p className="text-xs font-semibold opacity-70">{senderName}</p>
+      )}
+      <p className="text-sm break-words">{message.content}</p>
+      <p
+        className={`text-[10px] text-right ${
+          isOwnMessage ? "opacity-70" : "opacity-50"
+        }`}
+      >
+        {messageTime}
       </p>
     </div>
   );

@@ -9,13 +9,24 @@ import EmptyChatState from "./features/chat/EmptyChatState";
 import { useAuthStore } from "./stores/authStore";
 import { useEffect } from "react";
 
-// Componente para inicializar el estado de autenticación
 function AuthInitializer() {
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
+  const isLoading = useAuthStore((state) => state.isLoading);
 
   useEffect(() => {
     checkAuthStatus();
   }, [checkAuthStatus]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return null;
 }
@@ -48,7 +59,6 @@ function App() {
           element={
             <ProtectedRoute>
               <></>
-              {/* <ProfilePage /> */}
             </ProtectedRoute>
           }
         />

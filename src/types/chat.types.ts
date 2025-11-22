@@ -1,32 +1,48 @@
 export interface ChatStore {
-  // Estado
+  messages: any;
+
   conversations: Conversation[];
   activeConversationId: string | null;
   isLoading: boolean;
   searchQuery: string;
   filteredConversations: Conversation[];
 
-  // Acciones
   setActiveConversation: (id: string | null) => void;
   sendMessage: (message: string) => void;
   loadConversations: () => void;
-  loadMessages: (conversationId: string) => void;
+  loadMessages: (conversationId: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
   currentConversation: (conversationId: string) => Conversation | undefined;
   initialize: () => void;
 }
 
 export interface Conversation {
-  id: string;
-  name: string;
-  lastMessage: string | null;
-  updatedAt: Date;
-  messages: Message[];
+  _id: string;
+  participants?: string[];
+  otherUser?: {
+    _id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+  };
+  name?: string;
+  lastMessage?: string;
+  lastMessageAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface Message {
-  id: string;
-  userId: string;
+  _id: string;
+  conversationId: string;
+  senderId:
+    | string
+    | {
+        _id: string;
+        name: string;
+        avatar?: string;
+      };
   content: string;
-  createdAt: Date;
+  isRead?: boolean;
+  createdAt?: Date;
 }

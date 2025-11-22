@@ -13,12 +13,10 @@ function ChatMenuItem({ conversation, searchQuery = "" }: ChatMenuItemProps) {
   const activeConversationId = useChatStore(
     (state: ChatStore) => state.activeConversationId
   );
-  const isActive = activeConversationId === conversation.id;
+  const isActive = activeConversationId === conversation._id;
 
-  // Función para resaltar texto que coincide con la búsqueda
   const highlightText = (text: string, query: string) => {
     if (!query) return text;
-
     const parts = text.split(new RegExp(`(${query})`, "gi"));
     return parts.map((part, i) =>
       part.toLowerCase() === query.toLowerCase() ? (
@@ -30,8 +28,6 @@ function ChatMenuItem({ conversation, searchQuery = "" }: ChatMenuItemProps) {
       )
     );
   };
-
-  // Formatear la fecha de última actualización
   const formatTime = (date: Date): string => {
     const mins = differenceInMinutes(new Date(), date);
 
@@ -43,6 +39,16 @@ function ChatMenuItem({ conversation, searchQuery = "" }: ChatMenuItemProps) {
     return format(date, "P", { locale: es });
   };
 
+  const formatName = (conversation: Conversation) => {
+    if (conversation.name) {
+      return conversation.name;
+    }
+    if (conversation.otherUser) {
+      return conversation.otherUser.name;
+    }
+    return "Chat";
+  };
+
   return (
     <div
       className={`flex items-center gap-2 p-3 rounded-md cursor-pointer transition-colors duration-200 ${
@@ -52,7 +58,9 @@ function ChatMenuItem({ conversation, searchQuery = "" }: ChatMenuItemProps) {
       <div className="flex-shrink-0">
         <div className="rounded-full bg-emerald-200 px-2 py-1">
           <div className="text-xs font-medium">
-            {conversation.name.charAt(0).toUpperCase()}
+            {conversation.name
+              ? conversation.name
+              : "Chat"}
           </div>
         </div>
       </div>
@@ -60,10 +68,12 @@ function ChatMenuItem({ conversation, searchQuery = "" }: ChatMenuItemProps) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
           <div className="font-medium text-sm truncate">
-            {highlightText(conversation.name, searchQuery)}
+            {highlightText(formatName(conversation), searchQuery)}
           </div>
           <div className="text-xs text-muted-foreground flex-shrink-0 ml-2">
-            {formatTime(conversation.updatedAt)}
+            {formatTime(
+              conversation.lastMessageAt ? conversation.lastMessageAt : new Date()
+            )}
           </div>
         </div>
 

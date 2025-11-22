@@ -19,7 +19,7 @@ function ChatLayout() {
     if (conversationId && activeConversationId !== conversationId) {
       setActiveConversation(conversationId);
     }
-  }, [conversationId, setActiveConversation]);
+  }, [conversationId]);
 
   return (
     <div

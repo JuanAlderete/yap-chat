@@ -1,117 +1,131 @@
+import { authService } from "@/services/auth.service";
 import type {
   AuthContextType,
   LoginCredentials,
   RegisterCredentials,
 } from "@/types/auth.types";
-import { create, type StoreApi, type UseBoundStore } from "zustand";
+import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-function fakeLongRunningLogin(loginCredentials: LoginCredentials) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        user: {
-          id: "1",
-          email: loginCredentials.email,
-          name: "Guest",
-          avatar: "https://i.pravatar.cc/150?img=1",
-        },
-        token:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5NCIsImlhdCI6MTY0MjE3MjQ0NSwiZXhwIjoxNjQyNzc5NDQ1fQ.1-4-6-5-3-2-1-0-9-8-7-6-5-4-3-2-1",
-      });
-    }, 1000);
-  });
-}
-
-export const useAuthStore: UseBoundStore<StoreApi<AuthContextType>> = create(
+export const useAuthStore = create<AuthContextType>()(
   persist(
     (set, get) => ({
+      user: undefined,
+      token: undefined,
+      isAuthenticated: false,
+      isLoading: true,
+
       login: async (loginCredentials: LoginCredentials) => {
-        // Empezar loading
         set({ isLoading: true });
 
         try {
-          // Llamar API (como en Angular)
-          // const response = await fetch('/api/login', {
-          //     method: 'POST',
-          //     body: JSON.stringify(loginCredentials)
-          // });
-          // const data = await response.json();
-          const data = await fakeLongRunningLogin(loginCredentials);
+          const response = await authService.login(loginCredentials);
 
-          // Actualizar estado con éxito
+          localStorage.setItem("auth-token", response.token);
+
           set({
-            user: (data as { user: AuthContextType["user"] }).user,
-            token: (data as { token: string }).token,
+            user: response.user,
+            token: response.token,
             isAuthenticated: true,
             isLoading: false,
           });
-          console.log(data);
-        } catch (error) {
+        } catch (error: any) {
           set({
             isAuthenticated: false,
             isLoading: false,
           });
-          throw error;
+          throw new Error(
+            error.response?.data?.message || "Error al iniciar sesión"
+          );
         }
       },
+
       register: async (registerCredentials: RegisterCredentials) => {
-        // Empezar loading
         set({ isLoading: true });
 
         try {
-          // Llamar API (como en Angular)
-          const response = await fetch("/api/register", {
-            method: "POST",
-            body: JSON.stringify(registerCredentials),
-          });
-          const data = await response.json();
+          const response = await authService.register(registerCredentials);
 
-          // Actualizar estado con éxito
           set({
-            user: data.user,
-            token: data.token,
-            isAuthenticated: true,
+            user: response.user,
+            isAuthenticated: false,
             isLoading: false,
           });
-        } catch (error) {
+
+          return response;
+        } catch (error: any) {
           set({
             isAuthenticated: false,
             isLoading: false,
           });
-          throw error;
+          throw new Error(
+            error.response?.data?.message || "Error al registrar usuario"
+          );
         }
       },
-      logout: () =>
+
+      logout: () => {
+        localStorage.removeItem("auth-token");
         set({
           user: undefined,
           token: undefined,
           isAuthenticated: false,
           isLoading: false,
-        }),
-      checkAuthStatus: () => {
+        });
+      },
+
+      checkAuthStatus: async () => {
         const state = get();
-        // Si tenemos user y token, el usuario está autenticado
-        if (state.user && state.token) {
-          set({ isAuthenticated: true });
-        } else {
-          set({ isAuthenticated: false });
+        const token = localStorage.getItem("auth-token");
+
+        if (!token) {
+          set({
+            isAuthenticated: false,
+            isLoading: false,
+            user: undefined,
+            token: undefined,
+          });
+          return;
+        }
+
+        if (state.user && state.token === token) {
+          set({
+            isAuthenticated: true,
+            isLoading: false,
+          });
+          return;
+        }
+
+        try {
+          const user = await authService.getProfile();
+          set({
+            user,
+            token,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } catch (error) {
+          console.error("Token inválido:", error);
+          localStorage.removeItem("auth-token");
+          set({
+            user: undefined,
+            token: undefined,
+            isAuthenticated: false,
+            isLoading: false,
+          });
         }
       },
-      isAuthenticated: false,
-      isLoading: false,
     }),
     {
-      name: "auth-store", // nombre en localStorage
+      name: "auth-store",
       partialize: (state) => ({
         user: state.user,
         token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
       onRehydrateStorage: () => (state) => {
-        // Cuando se rehidrata el store, verificar el estado de autenticación
-        if (state && state.user && state.token) {
-          state.isAuthenticated = true;
+        if (state) {
+          state.checkAuthStatus();
         }
       },
     }
