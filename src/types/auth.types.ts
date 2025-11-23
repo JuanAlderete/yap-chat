@@ -34,4 +34,5 @@ export interface AuthContextType extends AuthState {
   register: (credentials: RegisterCredentials) => Promise<AuthResponse>;
   logout: () => void;
   checkAuthStatus: () => void;
+  updateProfile: (data: { name?: string; avatar?: string }) => Promise<any>;
 }

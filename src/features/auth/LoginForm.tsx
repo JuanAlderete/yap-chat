@@ -120,12 +120,6 @@ function LoginForm({ isFlipped }: LoginFormProps) {
               <p className="text-sm text-red-500">{errors.password.message}</p>
             )}
           </div>
-          {/* <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-3">
-              <Checkbox id="terms" />
-              <Label htmlFor="terms">Accept terms and conditions</Label>
-            </div>
-          </div> */}
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-2">

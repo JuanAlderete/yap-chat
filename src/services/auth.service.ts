@@ -29,4 +29,10 @@ export const authService = {
     const { data } = await api.get(`/auth/verify-email/${token}`);
     return data;
   },
+
+  // Actualizar perfil
+  updateProfile: async (data: { name?: string; avatar?: string }) => {
+    const response = await api.put("/auth/profile", data);
+    return response.data;
+  },
 };

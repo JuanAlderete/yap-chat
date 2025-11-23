@@ -115,6 +115,26 @@ export const useAuthStore = create<AuthContextType>()(
           });
         }
       },
+
+      updateProfile: async (data: { name?: string; avatar?: string }) => {
+        set({ isLoading: true });
+
+        try {
+          const response = await authService.updateProfile(data);
+
+          set((state) => ({
+            user: response.user,
+            isLoading: false,
+          }));
+
+          return response;
+        } catch (error: any) {
+          set({ isLoading: false });
+          throw new Error(
+            error.response?.data?.message || "Error al actualizar perfil"
+          );
+        }
+      },
     }),
     {
       name: "auth-store",
