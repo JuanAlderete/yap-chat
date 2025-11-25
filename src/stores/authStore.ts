@@ -122,7 +122,7 @@ export const useAuthStore = create<AuthContextType>()(
         try {
           const response = await authService.updateProfile(data);
 
-          set((state) => ({
+          set(() => ({
             user: response.user,
             isLoading: false,
           }));

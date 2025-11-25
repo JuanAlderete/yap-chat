@@ -39,16 +39,6 @@ function ChatMenuItem({ conversation, searchQuery = "" }: ChatMenuItemProps) {
     return format(date, "P", { locale: es });
   };
 
-  const formatName = (conversation: Conversation) => {
-    if (conversation.name) {
-      return conversation.name;
-    }
-    if (conversation.otherUser) {
-      return conversation.otherUser.name;
-    }
-    return "Chat";
-  };
-
   return (
     <div
       className={`flex items-center gap-2 p-2 md:p-3 rounded-md cursor-pointer transition-colors duration-200 ${
