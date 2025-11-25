@@ -130,4 +130,58 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       get().loadConversations();
     }
   },
+
+  // Editar mensaje
+  updateMessage: async (messageId: string, content: string) => {
+    const { activeConversationId } = get();
+    if (!activeConversationId) return;
+
+    try {
+      const updatedMessage = await messageService.updateMessage(
+        messageId,
+        content
+      );
+
+      // Actualizar mensaje en el estado local
+      set((state) => ({
+        messages: {
+          ...state.messages,
+          [activeConversationId]:
+            state.messages[activeConversationId]?.map((msg: Message) =>
+              msg._id === messageId ? updatedMessage : msg
+            ) || [],
+        },
+      }));
+    } catch (error) {
+      console.error("Error updating message:", error);
+      throw error;
+    }
+  },
+
+  // Eliminar mensaje
+  deleteMessage: async (messageId: string) => {
+    const { activeConversationId } = get();
+    if (!activeConversationId) return;
+
+    try {
+      await messageService.deleteMessage(messageId);
+
+      // Eliminar mensaje del estado local
+      set((state) => ({
+        messages: {
+          ...state.messages,
+          [activeConversationId]:
+            state.messages[activeConversationId]?.filter(
+              (msg: Message) => msg._id !== messageId
+            ) || [],
+        },
+      }));
+
+      // Recargar conversaciones para actualizar lastMessage
+      get().loadConversations();
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      throw error;
+    }
+  },
 }));

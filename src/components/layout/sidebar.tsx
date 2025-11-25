@@ -31,6 +31,9 @@ import { Label } from "@/components/ui/label";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useAuthStore } from "@/stores/authStore";
 import { convertImageToBase64, validateImageFile } from "@/utils/imageUtils";
+import { MessageSquarePlus } from "lucide-react";
+import NewChat from "../common/NewChat";
+import { toast } from "sonner";
 
 type ProfileFormData = {
   name: string;
@@ -49,6 +52,7 @@ function AppSidebar() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarBase64, setAvatarBase64] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [openNewChat, setOpenNewChat] = useState(false);
 
   useEffect(() => {
     initialize();
@@ -124,7 +128,11 @@ function AppSidebar() {
         return;
       }
 
-      //await updateProfile(updateData);
+      await toast.promise(() => updateProfile(updateData), {
+        loading: "Actualizando perfil...",
+        success: "Perfil actualizado exitosamente",
+        error: "Error al actualizar perfil",
+      });
 
       setIsDialogOpen(false);
       setAvatarBase64(null);
@@ -132,11 +140,8 @@ function AppSidebar() {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-      console.log(updateData)
-      alert("Perfil actualizado exitosamente");
     } catch (error: any) {
       console.error(error);
-      alert(error.message || "Error al actualizar perfil");
     } finally {
       setIsSubmitting(false);
     }
@@ -154,6 +159,16 @@ function AppSidebar() {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
+            <div className="px-2 pb-2">
+              <Button
+                onClick={() => setOpenNewChat(true)}
+                className="w-full"
+                variant="outline"
+              >
+                <MessageSquarePlus className="h-4 w-4 mr-2" />
+                Nueva conversación
+              </Button>
+            </div>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title} className="h-12">
@@ -305,6 +320,7 @@ function AppSidebar() {
           </div>
         </SidebarFooter>
       </Sidebar>
+      <NewChat openDialog={openNewChat} onClose={() => setOpenNewChat(false)} />
     </>
   );
 }

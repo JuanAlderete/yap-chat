@@ -24,4 +24,10 @@ export const messageService = {
     const { data } = await api.delete(`/messages/${messageId}`);
     return data;
   },
+
+  // Editar mensaje
+  updateMessage: async (messageId: string, content: string) => {
+    const { data } = await api.put(`/messages/${messageId}`, { content });
+    return data.message;
+  },
 };

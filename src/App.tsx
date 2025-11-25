@@ -8,6 +8,7 @@ import Layout from "./components/layout/Layout";
 import EmptyChatState from "./features/chat/EmptyChatState";
 import { useAuthStore } from "./stores/authStore";
 import { useEffect } from "react";
+import Toaster from "./components/ui/sonner";
 
 function AuthInitializer() {
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
@@ -66,6 +67,7 @@ function App() {
         {/* Ruta 404 */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <Toaster />
     </BrowserRouter>
   );
 }

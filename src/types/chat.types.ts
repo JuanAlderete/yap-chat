@@ -1,15 +1,16 @@
 export interface ChatStore {
-  messages: any;
-
   conversations: Conversation[];
   activeConversationId: string | null;
+  messages: Record<string, Message[]>;
   isLoading: boolean;
   searchQuery: string;
   filteredConversations: Conversation[];
 
   setActiveConversation: (id: string | null) => void;
-  sendMessage: (message: string) => void;
-  loadConversations: () => void;
+  sendMessage: (content: string) => Promise<void>;
+  updateMessage: (messageId: string, content: string) => Promise<void>; // <-- Agregar
+  deleteMessage: (messageId: string) => Promise<void>; // <-- Agregar
+  loadConversations: () => Promise<void>;
   loadMessages: (conversationId: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
   currentConversation: (conversationId: string) => Conversation | undefined;
@@ -28,8 +29,8 @@ export interface Conversation {
   name?: string;
   lastMessage?: string;
   lastMessageAt?: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface Message {
@@ -44,5 +45,6 @@ export interface Message {
       };
   content: string;
   isRead?: boolean;
-  createdAt?: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
