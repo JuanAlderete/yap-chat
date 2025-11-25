@@ -41,7 +41,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     if (state.isLoading && !forceReload) return;
 
     if (!forceReload && state.messages[conversationId]?.length > 0) {
-      console.log("Messages already loaded for:", conversationId);
+      //console.log("Messages already loaded for:", conversationId);
       return;
     }
 
@@ -89,6 +89,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 
+  // Cambiar conversación activa
   setActiveConversation: (id: string | null) => {
     if (!id) {
       set({ activeConversationId: null });
@@ -100,6 +101,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     get().loadMessages(id);
   },
 
+  // Buscar conversaciones
   setSearchQuery: (query: string) => {
     set({ searchQuery: query });
     const { conversations } = get();
@@ -119,11 +121,14 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set({ filteredConversations: filtered });
   },
 
+
+  // Obtener conversación actual
   currentConversation: (conversationId: string) => {
     const { conversations } = get();
     return conversations.find((conv) => conv._id === conversationId);
   },
 
+  // Inicializar conversaciones
   initialize: () => {
     const state = get();
     if (state.conversations.length === 0 && !state.isLoading) {
@@ -142,7 +147,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         content
       );
 
-      // Actualizar mensaje en el estado local
       set((state) => ({
         messages: {
           ...state.messages,
@@ -166,7 +170,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     try {
       await messageService.deleteMessage(messageId);
 
-      // Eliminar mensaje del estado local
       set((state) => ({
         messages: {
           ...state.messages,
@@ -177,7 +180,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         },
       }));
 
-      // Recargar conversaciones para actualizar lastMessage
       get().loadConversations();
     } catch (error) {
       console.error("Error deleting message:", error);

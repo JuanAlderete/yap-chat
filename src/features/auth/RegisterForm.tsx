@@ -28,6 +28,8 @@ interface RegisterFormProps {
 }
 
 function RegisterForm({ isFlipped }: RegisterFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -39,16 +41,15 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
   const authStore = useAuthStore();
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    console.log(data);
-    //await authStore.register(data);
-    // try {
-    //   await authStore.register(data);
-    //   navigate("/");
-    // } catch (error) {
-    //   console.error("Registration failed:", error);
-    // } finally {
-    //   setIsLoading(false);
-    // }
+    setIsLoading(true);
+    try {
+      await authStore.register(data);
+      navigate("/");
+    } catch (error) {
+      console.error("Registration failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClickFlipped = () => {
@@ -159,7 +160,11 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button onClick={handleSubmit(onSubmit)} className="w-full">
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          className="w-full"
+          disabled={isLoading}
+        >
           {authStore.isLoading ? "Loading..." : "Register"}
         </Button>
       </CardFooter>

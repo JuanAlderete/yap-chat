@@ -36,11 +36,11 @@ function LoginForm({ isFlipped }: LoginFormProps) {
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
     try {
-      console.log(data);
+      //console.log(data);
       await authStore.login(data);
       navigate("/");
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
