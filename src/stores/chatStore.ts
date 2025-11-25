@@ -1,6 +1,6 @@
 import { conversationService } from "@/services/conversation.service";
 import { messageService } from "@/services/message.service";
-import type { ChatStore, Conversation, Message } from "@/types/chat.types";
+import type { ChatStore, Message } from "@/types/chat.types";
 import { create } from "zustand";
 
 export const useChatStore = create<ChatStore>((set, get) => ({

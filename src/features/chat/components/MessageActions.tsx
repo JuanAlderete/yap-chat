@@ -82,7 +82,7 @@ function MessageActions({ message, isOwnMessage }: MessageActionsProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
-            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-1 hover:bg-black/10 rounded touch-manipulation"
+            className="absolute top-1 right-1 p-1 hover:bg-black/10 rounded touch-manipulation"
             onClick={(e) => e.stopPropagation()}
           >
             <MoreVertical className="h-3.5 w-3.5 md:h-4 md:w-4" />
@@ -154,20 +154,21 @@ function MessageActions({ message, isOwnMessage }: MessageActionsProps) {
         </DialogContent>
       </Dialog>
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="w-[95%] max-w-md sm:w-full rounded-lg">
           <DialogHeader>
-            <DialogTitle>¿Eliminar mensaje?</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg">¿Eliminar mensaje?</DialogTitle>
+            <DialogDescription className="text-sm">
               Esta acción no se puede deshacer. El mensaje será eliminado
               permanentemente.
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 flex-col sm:flex-row">
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isSubmitting}
+              className="w-full sm:w-auto"
             >
               Cancelar
             </Button>
@@ -175,6 +176,7 @@ function MessageActions({ message, isOwnMessage }: MessageActionsProps) {
               variant="destructive"
               onClick={handleDelete}
               disabled={isSubmitting}
+              className="w-full sm:w-auto"
             >
               {isSubmitting ? "Eliminando..." : "Eliminar"}
             </Button>
