@@ -29,7 +29,7 @@ export interface Conversation {
   name?: string;
   lastMessage?: string;
   lastMessageAt?: Date;
-  created_at?: Date;
+  created_at: Date;
   updated_at?: Date;
 }
 
@@ -45,6 +45,6 @@ export interface Message {
       };
   content: string;
   isRead?: boolean;
-  created_at?: Date;
+  created_at: Date;
   updated_at?: Date;
 }

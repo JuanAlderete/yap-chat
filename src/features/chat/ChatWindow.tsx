@@ -24,6 +24,7 @@ function ChatWindow() {
   const currentUser = useAuthStore((state) => state.user);
   const [messageInput, setMessageInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
     if (conversationId) {
@@ -55,13 +56,21 @@ function ChatWindow() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!messageInput.trim()) return;
+    if (!messageInput.trim() || isSending) return;
+
+    setIsSending(true);
 
     try {
       await sendMessage(messageInput);
       setMessageInput("");
+
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     } catch (error) {
       console.error("Error sending message:", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -136,7 +145,7 @@ function ChatWindow() {
             type="submit"
             variant="outline"
             className="shadow-lg"
-            disabled={!messageInput.trim() || isLoading}
+            disabled={!messageInput.trim() || isLoading || isSending}
           >
             Enviar
           </Button>
