@@ -17,7 +17,7 @@ function ChatBubble({ message, isOwnMessage }: ChatBubbleProps) {
 
   return (
     <div
-      className={`flex flex-col gap-1 p-3 rounded-lg w-fit max-w-md mb-2 shadow-md relative group ${
+      className={`flex flex-col gap-1 p-2 md:p-3 rounded-lg w-fit max-w-[85%] md:max-w-md mb-2 shadow-md relative group ${
         isOwnMessage
           ? "bg-primary text-primary-foreground ml-auto"
           : "bg-sidebar text-foreground"
@@ -25,9 +25,9 @@ function ChatBubble({ message, isOwnMessage }: ChatBubbleProps) {
     >
       <MessageActions message={message} isOwnMessage={isOwnMessage} />
       {!isOwnMessage && (
-        <p className="text-xs font-semibold opacity-70">{senderName}</p>
+        <p className="text-sm font-semibold opacity-70">{senderName}</p>
       )}
-      <p className="text-sm break-words whitespace-pre-wrap pr-6">
+      <p className="text-sm md:text-sm break-words whitespace-pre-wrap pr-6">
         {message.content}
       </p>
       <div className="flex items-center gap-1 justify-end">

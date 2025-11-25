@@ -94,10 +94,12 @@ function NewChat({ openDialog, onClose }: NewChatProps) {
 
   return (
     <AlertDialog open={openDialog} onOpenChange={handleClose}>
-      <AlertDialogContent className="max-w-md">
+      <AlertDialogContent className="max-w-[95%] sm:max-w-md">
         <AlertDialogHeader>
-          <AlertDialogTitle>Nueva Conversación</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-lg md:text-xl">
+            Nueva Conversación
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-xs md:text-sm">
             Busca un usuario para iniciar una conversación
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -107,11 +109,11 @@ function NewChat({ openDialog, onClose }: NewChatProps) {
             placeholder="Buscar por nombre o email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
+            className="pl-9 text-sm"
             autoFocus
           />
         </div>
-        <div className="max-h-60 overflow-y-auto space-y-2">
+        <div className="max-h-48 md:max-h-60 overflow-y-auto space-y-2">
           {isSearching && (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -152,8 +154,12 @@ function NewChat({ openDialog, onClose }: NewChatProps) {
               </button>
             ))}
         </div>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleClose} disabled={isCreating}>
+        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+          <AlertDialogCancel
+            onClick={handleClose}
+            disabled={isCreating}
+            className="w-full sm:w-auto"
+          >
             Cancelar
           </AlertDialogCancel>
         </AlertDialogFooter>

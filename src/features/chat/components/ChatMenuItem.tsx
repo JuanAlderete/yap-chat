@@ -51,34 +51,37 @@ function ChatMenuItem({ conversation, searchQuery = "" }: ChatMenuItemProps) {
 
   return (
     <div
-      className={`flex items-center gap-2 p-3 rounded-md cursor-pointer transition-colors duration-200 ${
+      className={`flex items-center gap-2 p-2 md:p-3 rounded-md cursor-pointer transition-colors duration-200 ${
         isActive ? "bg-[#E6D6CA] shadow-md" : "bg-sidebar hover:bg-[#E6D6CA]"
       }`}
     >
       <div className="flex-shrink-0">
         <div className="rounded-full bg-emerald-200 px-2 py-1">
           <div className="text-xs font-medium">
-            {conversation.name
-              ? conversation.name
-              : "Chat"}
+            {conversation.otherUser?.name?.charAt(0).toUpperCase() ||
+              conversation.name?.charAt(0).toUpperCase() ||
+              "C"}
           </div>
         </div>
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
-          <div className="font-medium text-sm truncate">
-            {highlightText(formatName(conversation), searchQuery)}
+          <div className="font-medium text-xs md:text-sm truncate flex-1">
+            {highlightText(
+              conversation.otherUser?.name || conversation.name || "Chat",
+              searchQuery
+            )}
           </div>
-          <div className="text-xs text-muted-foreground flex-shrink-0 ml-2">
+          <div className="text-[10px] md:text-xs text-muted-foreground flex-shrink-0 ml-2">
             {formatTime(
-              conversation.lastMessageAt ? conversation.lastMessageAt : new Date()
+              conversation.lastMessageAt || conversation.updated_at || new Date()
             )}
           </div>
         </div>
 
         {conversation.lastMessage && (
-          <div className="text-xs text-muted-foreground truncate">
+          <div className="text-[10px] md:text-xs text-muted-foreground truncate">
             {highlightText(conversation.lastMessage, searchQuery)}
           </div>
         )}

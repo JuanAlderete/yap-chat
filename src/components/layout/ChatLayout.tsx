@@ -24,7 +24,7 @@ function ChatLayout() {
   return (
     <div
       className={`flex h-full gap-2 ${
-        isMobile && hasActiveChat ? "m-0" : "my-2 mx-4"
+        isMobile && hasActiveChat ? "m-0" : "my-2 mx-2 md:mx-4"
       }`}
     >
       <div
@@ -35,7 +35,9 @@ function ChatLayout() {
         <ChatSidebar />
       </div>
 
-      <div className={`flex w-full`}>
+      <div
+        className={`flex w-full ${isMobile && !hasActiveChat ? "hidden" : ""}`}
+      >
         <Outlet />
       </div>
     </div>

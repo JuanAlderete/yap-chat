@@ -28,10 +28,12 @@ function ChatSidebar() {
     filteredConversations.length > 0 ? filteredConversations : [];
 
   return (
-    <div className="flex flex-col gap-3 overflow-y-auto max-h-[calc(100vh-64px)] customScrollbar pr-2 mt-12 w-full">
+    <div className="flex flex-col gap-2 md:gap-3 overflow-y-auto max-h-[calc(100vh-120px)] md:max-h-[calc(100vh-64px)] customScrollbar mt-12 md:mt-12 w-full">
       {searchQuery && displayConversations.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">
-          <p className="text-sm">No chats found for "{searchQuery}"</p>
+        <div className="text-center py-8 text-muted-foreground px-4">
+          <p className="text-xs md:text-sm">
+            No chats found for "{searchQuery}"
+          </p>
           <p className="text-xs mt-1">Try different keywords</p>
         </div>
       )}
@@ -41,6 +43,7 @@ function ChatSidebar() {
           key={conversation._id}
           to={`/chat/${conversation._id}`}
           onClick={() => handleClick(conversation._id)}
+          className="block"
         >
           <ChatMenuItem conversation={conversation} searchQuery={searchQuery} />
         </Link>

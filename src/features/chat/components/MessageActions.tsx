@@ -82,10 +82,10 @@ function MessageActions({ message, isOwnMessage }: MessageActionsProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
-            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-black/10 rounded"
+            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-1 hover:bg-black/10 rounded touch-manipulation"
             onClick={(e) => e.stopPropagation()}
           >
-            <MoreVertical className="h-4 w-4" />
+            <MoreVertical className="h-3.5 w-3.5 md:h-4 md:w-4" />
           </button>
         </DropdownMenuTrigger>
 
@@ -117,32 +117,36 @@ function MessageActions({ message, isOwnMessage }: MessageActionsProps) {
         </DropdownMenuContent>
       </DropdownMenu>
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="w-[95%] max-w-md sm:w-full rounded-lg">
           <DialogHeader>
-            <DialogTitle>Editar mensaje</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg">Editar mensaje</DialogTitle>
+            <DialogDescription className="text-sm">
               Modifica el contenido de tu mensaje
             </DialogDescription>
           </DialogHeader>
+
           <Textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
             placeholder="Escribe tu mensaje..."
-            className="min-h-24"
+            className="min-h-20 md:min-h-24 text-sm"
             maxLength={5000}
             disabled={isSubmitting}
           />
-          <DialogFooter>
+
+          <DialogFooter className="gap-2 flex-col sm:flex-row">
             <Button
               variant="outline"
               onClick={() => setIsEditDialogOpen(false)}
               disabled={isSubmitting}
+              className="w-full sm:w-auto"
             >
               Cancelar
             </Button>
             <Button
               onClick={handleEdit}
               disabled={isSubmitting || !editContent.trim()}
+              className="w-full sm:w-auto"
             >
               {isSubmitting ? "Guardando..." : "Guardar"}
             </Button>

@@ -7,10 +7,14 @@ import { useChatStore } from "@/stores/chatStore";
 import { useEffect, useState, useRef } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import type { Message } from "@/types/chat.types";
+import { ArrowLeft, Loader2, Send } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage, } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 function ChatWindow() {
   const { conversationId } = useParams();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   const {
     setActiveConversation,
@@ -99,13 +103,42 @@ function ChatWindow() {
         isMobile ? "rounded-none" : "rounded-lg"
       }`}
     >
-      <header className="flex items-center justify-between px-4 py-2 bg-sidebar rounded-t-lg rounded-b-xs shadow-sm">
-        <p className="text-xl font-medium">
-          {conversation?.otherUser?.name || conversation?.name || "Chat"}
-        </p>
+      <header className="flex items-center justify-between px-3 md:px-4 py-2 bg-sidebar rounded-t-lg md:rounded-t-lg rounded-b-xs shadow-sm">
+        {isMobile && (
+          <button
+            onClick={() => navigate("/")}
+            className="p-2 hover:bg-accent rounded-md transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+        )}
+        <div className="flex items-center gap-2 flex-1">
+          <Avatar className="h-8 w-8 md:h-10 md:w-10">
+            <AvatarImage
+              src={
+                conversation?.otherUser?.avatar ||
+                "https://github.com/shadcn.png"
+              }
+              alt={conversation?.otherUser?.name}
+            />
+            <AvatarFallback>
+              {conversation?.otherUser?.name?.charAt(0).toUpperCase() ||
+                conversation?.name?.charAt(0).toUpperCase() ||
+                "C"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <p className="text-base md:text-xl font-medium truncate">
+              {conversation?.otherUser?.name || conversation?.name || "Chat"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {conversation?.otherUser?.email}
+            </p>
+          </div>
+        </div>
       </header>
 
-      <div className="flex-1 flex flex-col w-full p-4 overflow-y-auto border-l-2 border-sidebar">
+      <div className="flex-1 flex flex-col w-full p-4 overflow-y-auto md:border-l-2 md:border-sidebar">
         {conversationMessages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             <p>No hay mensajes aún. ¡Envía el primero!</p>
@@ -132,22 +165,30 @@ function ChatWindow() {
         )}
       </div>
 
-      <footer className="flex w-full items-center gap-2 p-4 border-l-2 border-sidebar">
+      <footer className="flex w-full items-center gap-2 p-2 md:p-4 md:border-l-2 md:border-sidebar">
         <form onSubmit={handleSendMessage} className="flex w-full gap-2">
           <Input
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             placeholder="Escribe un mensaje..."
-            className="w-full rounded-xl bg-sidebar text-sm ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-none shadow-lg"
-            disabled={isLoading}
+            className="w-full rounded-xl bg-sidebar text-xs md:text-sm ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-none shadow-lg"
+            disabled={isLoading || isSending}
+            autoComplete="off"
           />
           <Button
             type="submit"
             variant="outline"
-            className="shadow-lg"
+            className="shadow-lg flex-shrink-0 h-9 md:h-10 px-3 md:px-4"
             disabled={!messageInput.trim() || isLoading || isSending}
           >
-            Enviar
+            {isSending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <Send className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Enviar</span>
+              </>
+            )}
           </Button>
         </form>
       </footer>

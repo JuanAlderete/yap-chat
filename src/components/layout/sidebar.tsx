@@ -162,11 +162,12 @@ function AppSidebar() {
             <div className="px-2 pb-2">
               <Button
                 onClick={() => setOpenNewChat(true)}
-                className="w-full"
-                variant="outline"
+                className="w-full text-sm"
+                size="sm"
               >
                 <MessageSquarePlus className="h-4 w-4 mr-2" />
-                Nueva conversación
+                <span className="hidden sm:inline">Nueva conversación</span>
+                <span className="sm:hidden">Nuevo chat</span>
               </Button>
             </div>
             <SidebarMenu>
@@ -206,17 +207,22 @@ function AppSidebar() {
                 </div>
               </DialogTrigger>
 
-              <DialogContent className="w-80 sm:max-w-md rounded-lg">
+              <DialogContent className="w-[95%] max-w-md sm:w-full rounded-lg">
                 <DialogHeader>
-                  <DialogTitle>Editar Perfil</DialogTitle>
-                  <DialogDescription>
+                  <DialogTitle className="text-lg md:text-xl">
+                    Editar Perfil
+                  </DialogTitle>
+                  <DialogDescription className="text-xs md:text-sm">
                     Actualiza tu información personal
                   </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                  <div className="flex flex-col items-center gap-4">
-                    <Avatar className="h-32 w-32">
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="space-y-3 md:space-y-4"
+                >
+                  <div className="flex flex-col items-center gap-3 md:gap-4">
+                    <Avatar className="h-24 w-24 md:h-32 md:w-32">
                       <AvatarImage
                         src={
                           avatarPreview ||
@@ -292,17 +298,22 @@ function AppSidebar() {
                     </p>
                   </div>
 
-                  <DialogFooter className="gap-2">
+                  <DialogFooter className="gap-2 flex-col sm:flex-row">
                     <DialogClose asChild>
                       <Button
                         type="button"
                         variant="outline"
                         disabled={isSubmitting}
+                        className="w-full sm:w-auto"
                       >
                         Cancelar
                       </Button>
                     </DialogClose>
-                    <Button type="submit" disabled={isSubmitting}>
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full sm:w-auto"
+                    >
                       {isSubmitting ? "Guardando..." : "Guardar cambios"}
                     </Button>
                   </DialogFooter>
