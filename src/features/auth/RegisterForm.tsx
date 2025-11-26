@@ -13,14 +13,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 type FormData = {
+  name: string;
   email: string;
   password: string;
-  confirmPassword: string;
-  terms: boolean;
 };
 
 interface RegisterFormProps {
@@ -43,7 +42,11 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
     setIsLoading(true);
     try {
-      await authStore.register(data);
+      await toast.promise(() => authStore.register(data), {
+        loading: "Registrando...",
+        success: "Usuario registrado exitosamente. Se envio un correo de confirmación",
+        error: "Error al registrar usuario",
+      });
       navigate("/");
     } catch (error) {
       console.error("Registration failed:", error);
@@ -77,6 +80,28 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div className="grid gap-1">
+            <Label htmlFor="name">Nombre</Label>
+            <Input
+              {...register("name", {
+                required: { value: true, message: "Nombre es requerido" },
+                minLength: {
+                  value: 2,
+                  message: "El nombre debe tener al menos 2 caracteres",
+                },
+              })}
+              type="text"
+              id="name"
+              className={
+                errors.name
+                  ? "border-red-300 focus-visible:ring-red-200 focus-visible:border-red-300"
+                  : ""
+              }
+            />
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name.message}</p>
+            )}
+          </div>
           <div className="grid gap-1">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -118,43 +143,6 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
             />
             {errors.password && (
               <p className="text-sm text-red-500">{errors.password.message}</p>
-            )}
-          </div>
-          <div className="grid gap-1">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              {...register("confirmPassword", {
-                required: {
-                  value: true,
-                  message: "Confirm password is required",
-                },
-              })}
-              type="password"
-              id="confirmPassword"
-              className={
-                errors.confirmPassword
-                  ? "border-red-300 focus-visible:ring-red-200 focus-visible:border-red-300"
-                  : ""
-              }
-            />
-            {errors.confirmPassword && (
-              <p className="text-sm text-red-500">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-col items-start justify-center w-full">
-            <div className="flex items-center gap-3">
-              <Checkbox
-                id="terms"
-                {...register("terms", {
-                  required: "You must accept the terms and conditions.",
-                })}
-              />
-              <Label htmlFor="terms">Accept terms and conditions</Label>
-            </div>
-            {errors.terms && (
-              <p className="text-sm text-red-500">{errors.terms.message}</p>
             )}
           </div>
         </form>

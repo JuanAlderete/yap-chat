@@ -2,13 +2,15 @@ import LoginForm from "@/features/auth/LoginForm";
 import RegisterForm from "@/features/auth/RegisterForm";
 import { useAuthStore } from "@/stores/authStore";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ReactCardFlip from "react-card-flip";
+import { toast } from "sonner";
 
 function LoginPage() {
   const [isFlipped, setIsFlipped] = useState(false);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleClick = () => setIsFlipped(!isFlipped);
 
@@ -17,6 +19,14 @@ function LoginPage() {
       navigate("/", { replace: true });
     }
   }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const from = searchParams.get("from");
+
+    if (from === "verified_email") {
+      toast.success("Tu correo fue verificado correctamente 🥳");
+    }
+  }, [searchParams]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
