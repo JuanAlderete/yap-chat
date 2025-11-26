@@ -41,37 +41,44 @@ Aplicación web de mensajería en tiempo real construida con React, TypeScript y
 ## ⚙️ Instalación Local
 
 1. Clonar el repositorio:
+
 ```bash
 git clone https://github.com/JuanAlderete/yap-chat.git
 cd yap-chat
 ```
 
 2. Instalar dependencias:
+
 ```bash
 ppnpm install
 ```
 
 3. Crear archivo `.env.local`:
+
 ```env
 VITE_API_URL=http://localhost:3000/api
 ```
 
 Para producción, usa la URL de tu backend deployado:
+
 ```env
 VITE_API_URL=https://tu-backend.onrender.com/api # Ejemplo
 ```
 
 4. Iniciar servidor de desarrollo:
+
 ```bash
 pnpm run dev
 ```
 
 5. Abrir en el navegador:
+
 ```
 http://localhost:5173
 ```
 
 ## 🏗️ Scripts Disponibles
+
 ```bash
 pnpm run dev      # Servidor de desarrollo
 pnpm run build    # Build para producción
@@ -79,6 +86,7 @@ pnpm run preview  # Preview del build
 ```
 
 ## 📁 Estructura del Proyecto
+
 ```
 src/
 ├── components/
@@ -108,6 +116,7 @@ src/
 ## 💬 Funcionalidades Principales
 
 ### **Conversaciones**
+
 - Crear nueva conversación buscando usuarios
 - Ver lista de conversaciones activas
 - Buscar en conversaciones
@@ -115,6 +124,7 @@ src/
 - Indicador de mensajes no leídos (próximamente)
 
 ### **Mensajes**
+
 - Enviar mensajes de texto
 - Ver mensajes en orden cronológico
 - Editar mensajes propios
@@ -124,6 +134,7 @@ src/
 - Paginación de mensajes históricos
 
 ### **Perfil**
+
 - Actualizar nombre
 - Subir avatar (Base64)
 - Ver información de la cuenta
@@ -131,6 +142,7 @@ src/
 ## 📱 Responsive Design
 
 ### Características Mobile:
+
 - Navegación adaptativa
 - Botón "volver" en chats
 - Sidebar colapsable
@@ -157,6 +169,7 @@ src/
 4. Deploy automático en cada push
 
 ### Deploy Manual
+
 ```bash
 # Build
 pnpm run build
@@ -171,23 +184,29 @@ vercel --prod
 ## 🐛 Troubleshooting
 
 ### Problema: No se conecta al backend
+
 **Solución**: Verifica que `VITE_API_URL` esté correctamente configurada en `.env.local`
 
 ### Problema: CORS error
+
 **Solución**: Asegúrate de que el backend tenga configurado el origen de Vercel en CORS
 
 ### Problema: 404 en rutas al recargar
+
 **Solución**: Vercel maneja esto automáticamente con Vite. Si persiste, revisa `vercel.json`
 
 ### Problema: El token expira muy rápido
+
 **Solución**: El token dura 7 días. Si necesitas más, ajusta `JWT_EXPIRE` en el backend
 
 ## 📦 Build para Producción
+
 ```bash
 pnpm run build
 ```
 
 Los archivos optimizados se generarán en `/dist`:
+
 - HTML minificado
 - CSS optimizado y tree-shaken
 - JavaScript bundled y minificado
@@ -200,6 +219,7 @@ Este proyecto es parte de un trabajo final de curso. No se aceptan contribucione
 ## 👨‍💻 Autor
 
 **Juan Alderete**
+
 - GitHub: [@JuanAlderete](https://github.com/JuanAlderete)
 - Frontend: [yap-chat](https://github.com/JuanAlderete/yap-chat)
 - Backend: [yap-chat-backend](https://github.com/JuanAlderete/yap-chat-backend)
@@ -210,3 +230,9 @@ Este proyecto es parte de un trabajo final de curso. No se aceptan contribucione
 
 - 📚 [Documentación del Backend](https://github.com/JuanAlderete/yap-chat-backend)
 - 🌐 [Demo en Vivo](https://yap-chat-front-git-production-juanalderetes-projects.vercel.app)
+
+## Notas
+
+Tengo 3 años de experiencia en desarrollo de aplicaciones web con angular en typescript.
+Por lo que acepte el reto de aprender react y realizar con typescript.
+Yo no hice el curso de frontend en la UTN, por lo que este frontend esta hecho por mi cuenta con lo que fui aprendiendo de internet con mi propio tiempo.
