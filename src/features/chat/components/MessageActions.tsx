@@ -82,7 +82,7 @@ function MessageActions({ message, isOwnMessage }: MessageActionsProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
-            className="absolute top-1 right-1 p-1 hover:bg-black/10 rounded touch-manipulation"
+            className="absolute top-1 right-1 p-1 hover:bg-black/10 rounded touch-manipulation cursor-pointer"
             onClick={(e) => e.stopPropagation()}
           >
             <MoreVertical className="h-3.5 w-3.5 md:h-4 md:w-4" />
@@ -109,7 +109,7 @@ function MessageActions({ message, isOwnMessage }: MessageActionsProps) {
               e.stopPropagation();
               setIsDeleteDialogOpen(true);
             }}
-            className="text-destructive cursor-pointer hover:bg-destructive/10 hover:text-destructive"
+            className="text-destructive cursor-pointer focus:bg-destructive/10 focus:text-destructive"
           >
             <Trash2 className="h-4 w-4 mr-2" />
             Eliminar

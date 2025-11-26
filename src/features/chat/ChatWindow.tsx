@@ -8,7 +8,7 @@ import { useEffect, useState, useRef } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import type { Message } from "@/types/chat.types";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage, } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 
 function ChatWindow() {
@@ -80,7 +80,7 @@ function ChatWindow() {
 
   if (isLoading && conversationMessages.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-full w-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
           <p>Cargando mensajes...</p>
@@ -91,8 +91,18 @@ function ChatWindow() {
 
   if (!conversation && !isLoading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p>Conversación no encontrada</p>
+      <div className="flex flex-col h-full w-full md:items-center md:justify-center">
+        <header className="flex items-center justify-between px-3 md:px-4 py-2 bg-sidebar shadow-sm md:hidden">
+          {isMobile && (
+            <button
+              onClick={() => navigate("/")}
+              className="p-2 hover:bg-accent rounded-md transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          )}
+        </header>
+        <p className="text-center mt-8">Conversación no encontrada</p>
       </div>
     );
   }
@@ -103,7 +113,7 @@ function ChatWindow() {
         isMobile ? "rounded-none" : "rounded-lg"
       }`}
     >
-      <header className="flex items-center justify-between px-3 md:px-4 py-2 bg-sidebar rounded-t-lg md:rounded-t-lg rounded-b-xs shadow-sm">
+      <header className="flex items-center justify-between px-3 md:px-4 py-2 bg-sidebar md:rounded-t-lg shadow-sm">
         {isMobile && (
           <button
             onClick={() => navigate("/")}
@@ -153,7 +163,7 @@ function ChatWindow() {
 
               return (
                 <div
-                  className={`${isOwnMessage ? "ml-auto" : ""} mb-2`}
+                  className={`${isOwnMessage ? "ml-auto" : ""} mb-1`}
                   key={message._id}
                 >
                   <ChatBubble message={message} isOwnMessage={isOwnMessage} />
@@ -178,7 +188,7 @@ function ChatWindow() {
           <Button
             type="submit"
             variant="outline"
-            className="shadow-lg flex-shrink-0 h-9 md:h-10 px-3 md:px-4"
+            className="shadow-lg flex-shrink-0 h-9 px-3 md:px-4"
             disabled={!messageInput.trim() || isLoading || isSending}
           >
             {isSending ? (

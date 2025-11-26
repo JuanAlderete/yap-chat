@@ -63,17 +63,16 @@ function NewChat({ openDialog, onClose }: NewChatProps) {
     setIsCreating(true);
 
     try {
-      const result = await toast.promise(
-        conversationService.createConversation(userId),
-        {
-          loading: "Creando conversación...",
-          success: "Conversación creada exitosamente",
-          error: "Error al crear conversación",
-        }
-      );
+      const promise = conversationService.createConversation(userId);
+      toast.promise(promise, {
+        loading: "Creando conversación...",
+        success: "Conversación creada exitosamente",
+        error: "Error al crear conversación",
+      });
+      const result = await promise;
       await loadConversations();
       onClose();
-      const conversation = (result as any)?.conversation ?? result;
+      const conversation = result?.conversation ?? result;
       navigate(`/chat/${conversation._id}`);
       setSearchQuery("");
       setSearchResults([]);

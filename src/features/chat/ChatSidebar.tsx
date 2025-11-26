@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import ChatMenuItem from "./components/ChatMenuItem";
 import { useChatStore } from "@/stores/chatStore";
 import { useEffect, useRef } from "react";
+import EmptyChatState from "./EmptyChatState";
 
 function ChatSidebar() {
   const {
@@ -28,27 +29,38 @@ function ChatSidebar() {
     filteredConversations.length > 0 ? filteredConversations : [];
 
   return (
-    <div className="flex flex-col gap-2 md:gap-3 overflow-y-auto max-h-[calc(100vh-120px)] md:max-h-[calc(100vh-64px)] customScrollbar mt-12 md:mt-12 w-full">
-      {searchQuery && displayConversations.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground px-4">
-          <p className="text-xs md:text-sm">
-            No chats found for "{searchQuery}"
-          </p>
-          <p className="text-xs mt-1">Try different keywords</p>
-        </div>
-      )}
+    <>
+      <div className="flex flex-col gap-2 md:gap-3 overflow-y-auto max-h-[calc(100vh-120px)] md:max-h-[calc(100vh-64px)] customScrollbar mt-12 md:mt-12 w-full">
+        {searchQuery && displayConversations.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground px-4">
+            <p className="text-xs md:text-sm">
+              No se encontraron conversaciones con el término “{searchQuery}”
+            </p>
+            <p className="text-xs mt-1">Prueba con otro término</p>
+          </div>
+        )}
 
-      {displayConversations.map((conversation) => (
-        <Link
-          key={conversation._id}
-          to={`/chat/${conversation._id}`}
-          onClick={() => handleClick(conversation._id)}
-          className="block"
-        >
-          <ChatMenuItem conversation={conversation} searchQuery={searchQuery} />
-        </Link>
-      ))}
-    </div>
+        {displayConversations.map((conversation) => (
+          <Link
+            key={conversation._id}
+            to={`/chat/${conversation._id}`}
+            onClick={() => handleClick(conversation._id)}
+            className="block"
+          >
+            <ChatMenuItem
+              conversation={conversation}
+              searchQuery={searchQuery}
+            />
+          </Link>
+        ))}
+
+        {!searchQuery && displayConversations.length === 0 && (
+          <div className="h-full md:hidden">
+            <EmptyChatState />
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

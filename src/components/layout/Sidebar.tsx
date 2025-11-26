@@ -260,7 +260,7 @@ function AppSidebar() {
                     </div>
 
                     <p className="text-xs text-muted-foreground text-center">
-                      Formatos: JPG, PNG, GIF (máx. 2MB)
+                      Formatos: JPG, PNG, WEBP (máx. 2MB)
                     </p>
                   </div>
                   <div className="space-y-2">
