@@ -24,7 +24,9 @@ function LoginPage() {
     const from = searchParams.get("from");
 
     if (from === "verified_email") {
-      toast.success("Tu correo fue verificado correctamente 🥳");
+      setTimeout(() => {
+        toast.success("Tu correo fue verificado correctamente 🥳");
+      }, 1000);
     }
   }, [searchParams]);
 
