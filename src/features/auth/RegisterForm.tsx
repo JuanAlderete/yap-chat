@@ -68,13 +68,13 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
         className="px-8 mx-auto w-full"
       />
       <CardHeader>
-        <CardTitle>Sign up to your account</CardTitle>
+        <CardTitle>Registro en tu cuenta</CardTitle>
         <CardDescription>
-          Enter your email and password below to sign up to your account
+          Ingresa tu correo electrónico y contraseña para registrarte en tu cuenta
         </CardDescription>
         <CardAction>
           <Button variant="link" onClick={handleClickFlipped}>
-            Login
+            Iniciar sesión
           </Button>
         </CardAction>
       </CardHeader>
@@ -125,7 +125,7 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
             )}
           </div>
           <div className="grid gap-1">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Contraseña</Label>
             <Input
               {...register("password", {
                 required: {
@@ -153,7 +153,7 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
           className="w-full"
           disabled={isLoading}
         >
-          {authStore.isLoading ? "Loading..." : "Register"}
+          {authStore.isLoading ? "Cargando..." : "Registrarme"}
         </Button>
       </CardFooter>
     </Card>

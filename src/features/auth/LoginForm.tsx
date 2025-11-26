@@ -57,13 +57,13 @@ function LoginForm({ isFlipped }: LoginFormProps) {
         className="px-8 mx-auto w-full"
       />
       <CardHeader>
-        <CardTitle>Login to your account</CardTitle>
+        <CardTitle>Iniciar sesión en tu cuenta</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Ingresa tu correo electrónico para iniciar sesión en tu cuenta
         </CardDescription>
         <CardAction>
           <Button variant="link" onClick={handleClickFlipped}>
-            Sign Up
+            Registrarme
           </Button>
         </CardAction>
       </CardHeader>
@@ -93,13 +93,13 @@ function LoginForm({ isFlipped }: LoginFormProps) {
           </div>
           <div className="grid gap-1">
             <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-              <a
+              <Label htmlFor="password">Contraseña</Label>
+              {/* <a
                 href="#"
                 className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
               >
                 Forgot your password?
-              </a>
+              </a> */}
             </div>
             <Input
               {...register("password", {
@@ -124,7 +124,7 @@ function LoginForm({ isFlipped }: LoginFormProps) {
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button onClick={handleSubmit(onSubmit)} className="w-full">
-          {authStore.isLoading ? "Loading..." : "Login"}
+          {authStore.isLoading ? "Cargando..." : "Iniciar sesión"}
         </Button>
         {/* <Button variant="outline" className="w-full">
           Login with Google
