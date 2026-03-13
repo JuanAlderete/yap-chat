@@ -1,4 +1,5 @@
 import { authService } from "@/services/auth.service";
+import { socketService } from "@/services/socket.service";
 import type {
   AuthContextType,
   LoginCredentials,
@@ -29,6 +30,8 @@ export const useAuthStore = create<AuthContextType>()(
             isAuthenticated: true,
             isLoading: false,
           });
+
+          socketService.connect(response.token);
         } catch (error: any) {
           set({
             isAuthenticated: false,
@@ -65,6 +68,7 @@ export const useAuthStore = create<AuthContextType>()(
       },
 
       logout: () => {
+        socketService.disconnect();
         localStorage.removeItem("auth-token");
         set({
           user: undefined,
@@ -93,6 +97,7 @@ export const useAuthStore = create<AuthContextType>()(
             isAuthenticated: true,
             isLoading: false,
           });
+          socketService.connect(token);
           return;
         }
 
@@ -104,6 +109,8 @@ export const useAuthStore = create<AuthContextType>()(
             isAuthenticated: true,
             isLoading: false,
           });
+
+          socketService.connect(token);
         } catch (error) {
           console.error("Token inválido:", error);
           localStorage.removeItem("auth-token");

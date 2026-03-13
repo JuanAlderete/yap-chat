@@ -4,59 +4,148 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useParams } from "react-router-dom";
 import ChatBubble from "./components/ChatBubble";
 import { useChatStore } from "@/stores/chatStore";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import type { Message } from "@/types/chat.types";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { socketService } from "@/services/socket.service";
+
+const EMPTY_MESSAGES: Message[] = [];
 
 function ChatWindow() {
   const { conversationId } = useParams();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
-  const {
-    setActiveConversation,
-    currentConversation,
-    sendMessage,
-    loadMessages,
-    messages,
-    isLoading,
-  } = useChatStore();
+  const setActiveConversation = useChatStore((s) => s.setActiveConversation);
+  const sendMessageAction = useChatStore((s) => s.sendMessage);
+  const loadMessages = useChatStore((s) => s.loadMessages);
+  const loadConversations = useChatStore((s) => s.loadConversations);
+  const isLoadingMessages = useChatStore((s) => s.isLoadingMessages);
+  const isLoadingConversations = useChatStore((s) => s.isLoadingConversations);
+  const addMessage = useChatStore((s) => s.addMessage);
+  const replaceMessage = useChatStore((s) => s.replaceMessage);
+  const removeMessage = useChatStore((s) => s.removeMessage);
+  const conversations = useChatStore((s) => s.conversations);
+  const allMessages = useChatStore((s) => s.messages);
+
+  // Derive messages and conversation from store state using stable references
+  const conversationMessages = (conversationId ? allMessages[conversationId] : undefined) ?? EMPTY_MESSAGES;
+  const conversation = conversations.find((c) => c._id === conversationId);
 
   const currentUser = useAuthStore((state) => state.user);
   const [messageInput, setMessageInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isSending, setIsSending] = useState(false);
+  const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // ── Load conversations if not loaded yet ────────────────────────────────
   useEffect(() => {
-    if (conversationId) {
-      setActiveConversation(conversationId);
-      loadMessages(conversationId);
+    if (conversations.length === 0) {
+      loadConversations();
     }
+  }, [conversations.length, loadConversations]);
+
+  // ── Set active conversation & load messages ─────────────────────────────
+  useEffect(() => {
+    if (!conversationId) return;
+
+    setActiveConversation(conversationId);
+    loadMessages(conversationId);
+
     return () => {
       setActiveConversation(null);
     };
   }, [conversationId, setActiveConversation, loadMessages]);
 
+  // ── Socket effect (separate from data loading) ──────────────────────────
+  useEffect(() => {
+    if (!conversationId) return;
+
+    socketService.joinConversation(conversationId);
+
+    const handleNewMessage = (message: Message) => {
+      console.log("[Socket] new_message recibido:", message._id, message.content?.substring(0, 30));
+      if (message.conversationId === conversationId) {
+        addMessage(conversationId, message);
+      }
+    };
+
+    const handleUpdatedMessage = (message: Message) => {
+      if (message.conversationId === conversationId) {
+        replaceMessage(conversationId, message);
+      }
+    };
+
+    const handleDeletedMessage = ({
+      messageId,
+      conversationId: cid,
+    }: {
+      messageId: string;
+      conversationId: string;
+    }) => {
+      if (cid === conversationId) {
+        removeMessage(conversationId, messageId);
+      }
+    };
+
+    const handleTypingStart = ({ userId }: { userId: string }) => {
+      console.log("[Socket] typing:start from:", userId);
+      if (userId !== currentUser?._id) {
+        setIsOtherUserTyping(true);
+      }
+    };
+
+    const handleTypingStop = ({ userId }: { userId: string }) => {
+      if (userId !== currentUser?._id) {
+        setIsOtherUserTyping(false);
+      }
+    };
+
+    socketService.onNewMessage(handleNewMessage);
+    socketService.onUpdatedMessage(handleUpdatedMessage);
+    socketService.onDeletedMessage(handleDeletedMessage);
+    socketService.onTypingStart(handleTypingStart);
+    socketService.onTypingStop(handleTypingStop);
+
+    return () => {
+      socketService.leaveConversation(conversationId);
+      socketService.offChatListeners();
+      setIsOtherUserTyping(false);
+    };
+  }, [conversationId, currentUser?._id, addMessage, replaceMessage, removeMessage]);
+
+  // ── Auto-scroll ────────────────────────────────────────────────────────────
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages[conversationId || ""]]);
-
-  const conversation = conversationId
-    ? currentConversation(conversationId)
-    : null;
-
-  const conversationMessages = conversationId
-    ? messages[conversationId] || []
-    : [];
+  }, [conversationMessages]);
 
   const sortedMessages = [...conversationMessages].sort(
     (a, b) =>
       new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   );
 
+  // ── Typing indicator ───────────────────────────────────────────────────────
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setMessageInput(e.target.value);
+
+      if (!conversationId) return;
+
+      socketService.emitTypingStart(conversationId);
+
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        socketService.emitTypingStop(conversationId);
+      }, 1000);
+    },
+    [conversationId]
+  );
+
+  // ── Send message ───────────────────────────────────────────────────────────
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -64,8 +153,14 @@ function ChatWindow() {
 
     setIsSending(true);
 
+    // Stop typing indicator immediately
+    if (conversationId) {
+      socketService.emitTypingStop(conversationId);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    }
+
     try {
-      await sendMessage(messageInput);
+      await sendMessageAction(messageInput);
       setMessageInput("");
 
       setTimeout(() => {
@@ -78,7 +173,8 @@ function ChatWindow() {
     }
   };
 
-  if (isLoading && conversationMessages.length === 0) {
+  // ── Loading state ──────────────────────────────────────────────────────────
+  if ((isLoadingMessages || isLoadingConversations) && conversationMessages.length === 0) {
     return (
       <div className="flex items-center justify-center h-full w-full">
         <div className="text-center">
@@ -89,7 +185,7 @@ function ChatWindow() {
     );
   }
 
-  if (!conversation && !isLoading) {
+  if (!conversation && !isLoadingConversations && conversations.length > 0) {
     return (
       <div className="flex flex-col h-full w-full md:items-center md:justify-center">
         <header className="flex items-center justify-between px-3 md:px-4 py-2 bg-sidebar shadow-sm md:hidden">
@@ -141,8 +237,14 @@ function ChatWindow() {
             <p className="text-base md:text-xl font-medium truncate">
               {conversation?.otherUser?.name || conversation?.name || "Chat"}
             </p>
-            <p className="text-xs text-muted-foreground">
-              {conversation?.otherUser?.email}
+            <p className="text-xs text-muted-foreground transition-all duration-200">
+              {isOtherUserTyping ? (
+                <span className="italic text-primary animate-pulse">
+                  escribiendo...
+                </span>
+              ) : (
+                conversation?.otherUser?.email
+              )}
             </p>
           </div>
         </div>
@@ -179,17 +281,17 @@ function ChatWindow() {
         <form onSubmit={handleSendMessage} className="flex w-full gap-2">
           <Input
             value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
+            onChange={handleInputChange}
             placeholder="Escribe un mensaje..."
             className="w-full rounded-xl bg-sidebar text-xs md:text-sm ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-none shadow-lg"
-            disabled={isLoading || isSending}
+            disabled={isLoadingMessages || isSending}
             autoComplete="off"
           />
           <Button
             type="submit"
             variant="outline"
             className="shadow-lg flex-shrink-0 h-9 px-3 md:px-4"
-            disabled={!messageInput.trim() || isLoading || isSending}
+            disabled={!messageInput.trim() || isLoadingMessages || isSending}
           >
             {isSending ? (
               <Loader2 className="h-4 w-4 animate-spin" />

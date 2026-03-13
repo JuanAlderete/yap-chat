@@ -7,7 +7,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   conversations: [],
   activeConversationId: null,
   messages: {},
-  isLoading: false,
+  isLoadingConversations: false,
+  isLoadingMessages: false,
+  get isLoading() {
+    return this.isLoadingConversations || this.isLoadingMessages;
+  },
   searchQuery: "",
   filteredConversations: [],
 
@@ -15,19 +19,19 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   loadConversations: async () => {
     const state = get();
 
-    if (state.isLoading) return;
+    if (state.isLoadingConversations) return;
 
-    set({ isLoading: true });
+    set({ isLoadingConversations: true });
     try {
       const conversations = await conversationService.getMyConversations();
       set({
         conversations,
         filteredConversations: conversations,
-        isLoading: false,
+        isLoadingConversations: false,
       });
     } catch (error) {
       console.error("Error loading conversations:", error);
-      set({ isLoading: false });
+      set({ isLoadingConversations: false });
     }
   },
 
@@ -38,14 +42,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   ) => {
     const state = get();
 
-    if (state.isLoading && !forceReload) return;
+    if (state.isLoadingMessages && !forceReload) return;
 
     if (!forceReload && state.messages[conversationId]?.length > 0) {
-      //console.log("Messages already loaded for:", conversationId);
       return;
     }
 
-    set({ isLoading: true });
+    set({ isLoadingMessages: true });
     try {
       const response = await messageService.getMessages(conversationId);
       set((state) => ({
@@ -53,11 +56,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           ...state.messages,
           [conversationId]: response.messages,
         },
-        isLoading: false,
+        isLoadingMessages: false,
       }));
     } catch (error) {
       console.error("Error loading messages:", error);
-      set({ isLoading: false });
+      set({ isLoadingMessages: false });
     }
   },
 
@@ -72,15 +75,21 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         content
       );
 
-      set((state) => ({
-        messages: {
-          ...state.messages,
-          [activeConversationId]: [
-            ...(state.messages[activeConversationId] || []),
-            newMessage,
-          ],
-        },
-      }));
+      // Insertamos localmente para el emisor pero con guard contra duplicados
+      // (por si el socket entrega el evento antes de que termine el HTTP POST)
+      set((state) => {
+        const existing = state.messages[activeConversationId] || [];
+        if (existing.some((m) => m._id === newMessage._id)) {
+          return state; // Ya llegó por socket
+        }
+
+        return {
+          messages: {
+            ...state.messages,
+            [activeConversationId]: [...existing, newMessage],
+          },
+        };
+      });
 
       get().loadConversations();
     } catch (error) {
@@ -96,7 +105,16 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       return;
     }
 
-    set({ activeConversationId: id });
+    // Reset unread count for this conversation
+    set((state) => ({
+      activeConversationId: id,
+      conversations: state.conversations.map((conv) =>
+        conv._id === id ? { ...conv, unreadCount: 0 } : conv
+      ),
+      filteredConversations: state.filteredConversations.map((conv) =>
+        conv._id === id ? { ...conv, unreadCount: 0 } : conv
+      ),
+    }));
 
     get().loadMessages(id);
   },
@@ -121,7 +139,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set({ filteredConversations: filtered });
   },
 
-
   // Obtener conversación actual
   currentConversation: (conversationId: string) => {
     const { conversations } = get();
@@ -131,7 +148,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   // Inicializar conversaciones
   initialize: () => {
     const state = get();
-    if (state.conversations.length === 0 && !state.isLoading) {
+    if (state.conversations.length === 0 && !state.isLoadingConversations) {
       get().loadConversations();
     }
   },
@@ -185,5 +202,90 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       console.error("Error deleting message:", error);
       throw error;
     }
+  },
+
+  // Eliminar conversación (desde la UI)
+  deleteConversation: async (id: string) => {
+    try {
+      await conversationService.deleteConversation(id);
+
+      set((state) => {
+        const { [id]: _removed, ...remainingMessages } = state.messages;
+        void _removed;
+        return {
+          conversations: state.conversations.filter((c) => c._id !== id),
+          filteredConversations: state.filteredConversations.filter(
+            (c) => c._id !== id
+          ),
+          messages: remainingMessages,
+          activeConversationId:
+            state.activeConversationId === id
+              ? null
+              : state.activeConversationId,
+        };
+      });
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      throw error;
+    }
+  },
+
+  // ── Socket real-time methods ──────────────────────────────────────────────
+
+  // Agrega un mensaje nuevo sin hacer fetch
+  addMessage: (conversationId: string, message: Message) => {
+    const { activeConversationId, messages } = get();
+    const isActive = activeConversationId === conversationId;
+
+    // Evitar duplicados: si el mensaje ya existe (insertado localmente por sendMessage), ignorar
+    const existing = messages[conversationId];
+    if (existing?.some((m) => m._id === message._id)) return;
+
+    set((state) => ({
+      messages: {
+        ...state.messages,
+        [conversationId]: [
+          ...(state.messages[conversationId] || []),
+          message,
+        ],
+      },
+      // Increment unread count only for non-active conversations
+      conversations: state.conversations.map((conv) =>
+        conv._id === conversationId && !isActive
+          ? { ...conv, unreadCount: (conv.unreadCount ?? 0) + 1 }
+          : conv
+      ),
+      filteredConversations: state.filteredConversations.map((conv) =>
+        conv._id === conversationId && !isActive
+          ? { ...conv, unreadCount: (conv.unreadCount ?? 0) + 1 }
+          : conv
+      ),
+    }));
+  },
+
+  // Reemplaza un mensaje existente por su ID
+  replaceMessage: (conversationId: string, message: Message) => {
+    set((state) => ({
+      messages: {
+        ...state.messages,
+        [conversationId]:
+          state.messages[conversationId]?.map((msg) =>
+            msg._id === message._id ? message : msg
+          ) || [],
+      },
+    }));
+  },
+
+  // Elimina un mensaje por ID
+  removeMessage: (conversationId: string, messageId: string) => {
+    set((state) => ({
+      messages: {
+        ...state.messages,
+        [conversationId]:
+          state.messages[conversationId]?.filter(
+            (msg) => msg._id !== messageId
+          ) || [],
+      },
+    }));
   },
 }));
