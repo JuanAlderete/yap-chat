@@ -50,11 +50,14 @@ function LoginForm({ isFlipped }: LoginFormProps) {
   };
 
   return (
-    <Card className="min-w-[20rem] max-w-xl mx-8">
+    <Card className="w-[calc(100%-2rem)] sm:w-full max-w-md mx-auto">
       <img
         src="../../../yap-chat-logo.png"
-        alt="logo"
-        className="px-8 mx-auto w-full"
+        alt="YAP Chat Logo"
+        width={400}
+        height={100}
+        className="px-8 mt-6 mx-auto w-full h-auto aspect-[4/1] object-contain"
+        loading="eager"
       />
       <CardHeader>
         <CardTitle>Iniciar sesión en tu cuenta</CardTitle>
@@ -81,6 +84,8 @@ function LoginForm({ isFlipped }: LoginFormProps) {
               })}
               type="text"
               id="email"
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? "email-error" : undefined}
               className={
                 errors.email
                   ? "border-red-300 focus-visible:ring-red-200 focus-visible:border-red-300"
@@ -88,7 +93,7 @@ function LoginForm({ isFlipped }: LoginFormProps) {
               }
             />
             {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
+              <p id="email-error" className="text-sm text-red-500">{errors.email.message}</p>
             )}
           </div>
           <div className="grid gap-1">
@@ -110,6 +115,8 @@ function LoginForm({ isFlipped }: LoginFormProps) {
               })}
               type="password"
               id="password"
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? "password-error" : undefined}
               className={
                 errors.password
                   ? "border-red-300 focus-visible:ring-red-200 focus-visible:border-red-300"
@@ -117,7 +124,7 @@ function LoginForm({ isFlipped }: LoginFormProps) {
               }
             />
             {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
+              <p id="password-error" className="text-sm text-red-500">{errors.password.message}</p>
             )}
           </div>
         </form>

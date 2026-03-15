@@ -237,7 +237,7 @@ function ChatWindow() {
             <p className="text-base md:text-xl font-medium truncate">
               {conversation?.otherUser?.name || conversation?.name || "Chat"}
             </p>
-            <p className="text-xs text-muted-foreground transition-all duration-200">
+            <p className="text-xs text-muted-foreground transition-all duration-200 min-h-[1rem]">
               {isOtherUserTyping ? (
                 <span className="italic text-primary animate-pulse">
                   escribiendo...
@@ -283,14 +283,14 @@ function ChatWindow() {
             value={messageInput}
             onChange={handleInputChange}
             placeholder="Escribe un mensaje..."
-            className="w-full rounded-xl bg-sidebar text-xs md:text-sm ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-none shadow-lg"
+            className="w-full h-11 px-4 py-3 rounded-xl bg-sidebar text-xs md:text-sm ring-0 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-none shadow-lg transition-transform focus-within:scale-[1.01]"
             disabled={isLoadingMessages || isSending}
             autoComplete="off"
           />
           <Button
             type="submit"
             variant="outline"
-            className="shadow-lg flex-shrink-0 h-9 px-3 md:px-4"
+            className="shadow-lg flex-shrink-0 h-11 rounded-xl px-4 md:px-5"
             disabled={!messageInput.trim() || isLoadingMessages || isSending}
           >
             {isSending ? (

@@ -25,18 +25,18 @@ function ChatBubble({ message, isOwnMessage }: ChatBubbleProps) {
     >
       <MessageActions message={message} isOwnMessage={isOwnMessage} />
       {!isOwnMessage && (
-        <p className="text-sm font-semibold opacity-70">{senderName}</p>
+        <p className="text-sm font-semibold text-muted-foreground">{senderName}</p>
       )}
-      <p className="text-sm md:text-sm break-words whitespace-pre-wrap pr-6">
+      <p className="text-sm break-words whitespace-pre-wrap pr-6">
         {message.content}
       </p>
       <div className="flex items-center gap-1 justify-end">
         {message.updated_at && message.updated_at !== message.created_at && (
-          <span className="text-[9px] opacity-50">(editado)</span>
+          <span className={`text-xs ${isOwnMessage ? "text-primary-foreground/70" : "text-muted-foreground"}`}>(editado)</span>
         )}
         <p
-          className={`text-[10px] ${
-            isOwnMessage ? "opacity-70" : "opacity-50"
+          className={`text-xs ${
+            isOwnMessage ? "text-primary-foreground/70" : "text-muted-foreground"
           }`}
         >
           {messageTime}

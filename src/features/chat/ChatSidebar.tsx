@@ -45,7 +45,7 @@ function ChatSidebar() {
 
   return (
     <>
-      <div className="flex flex-col gap-2 md:gap-3 overflow-y-auto max-h-[calc(100vh-120px)] md:max-h-[calc(100vh-64px)] customScrollbar mt-12 md:mt-12 w-full">
+      <div className="flex flex-col gap-2 md:gap-3 flex-1 overflow-y-auto h-full customScrollbar mt-12 md:mt-12 w-full">
         {/* Skeleton loaders while conversations are loading */}
         {isLoading && conversations.length === 0 &&
           Array.from({ length: 5 }).map((_, i) => (
@@ -55,10 +55,10 @@ function ChatSidebar() {
 
         {searchQuery && displayConversations.length === 0 && !isLoading && (
           <div className="text-center py-8 text-muted-foreground px-4">
-            <p className="text-xs md:text-sm">
+            <p className="text-xs md:text-sm text-balance">
               No se encontraron conversaciones con el término "{searchQuery}"
             </p>
-            <p className="text-xs mt-1">Prueba con otro término</p>
+            <p className="text-xs mt-1 text-balance">Prueba con otro término</p>
           </div>
         )}
 

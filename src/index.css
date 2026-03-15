@@ -117,8 +117,41 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
+  html, body {
+    @apply h-[100dvh] overflow-hidden bg-background text-foreground;
+  }
+  #root {
+    @apply h-full w-full flex flex-col overflow-hidden;
+  }
+}
+
+@layer utilities {
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-fade-up-delayed-1 {
+    animation-delay: 150ms;
+  }
+
+  .animate-fade-up-delayed-2 {
+    animation-delay: 200ms;
+  }
+
+  .animate-fade-up-delayed-3 {
+    animation-delay: 300ms;
   }
 }
 

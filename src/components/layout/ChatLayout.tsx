@@ -23,12 +23,12 @@ function ChatLayout() {
 
   return (
     <div
-      className={`flex h-full gap-2 ${
-        isMobile && hasActiveChat ? "m-0" : "my-2 mx-2 md:mx-4"
+      className={`flex flex-1 overflow-hidden gap-2 ${
+        isMobile && hasActiveChat ? "m-0" : "p-2 md:p-4"
       }`}
     >
       <div
-        className={`${isMobile ? "w-full" : "w-80 min-w-60 max-w-80"} ${
+        className={`flex flex-col h-full overflow-hidden ${isMobile ? "w-full" : "w-80 min-w-60 max-w-80"} ${
           isMobile && hasActiveChat ? "hidden" : "flex"
         }`}
       >
@@ -36,7 +36,7 @@ function ChatLayout() {
       </div>
 
       <div
-        className={`flex w-full ${isMobile && !hasActiveChat ? "hidden" : ""}`}
+        className={`flex flex-col flex-1 h-full overflow-hidden ${isMobile && !hasActiveChat ? "hidden" : ""}`}
       >
         <Outlet />
       </div>

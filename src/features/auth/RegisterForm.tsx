@@ -61,11 +61,14 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
   };
 
   return (
-    <Card className="min-w-[20rem] max-w-xl mx-8" key="back">
+    <Card className="w-[calc(100%-2rem)] sm:w-full max-w-md mx-auto" key="back">
       <img
         src="../../../yap-chat-logo.png"
-        alt="logo"
-        className="px-8 mx-auto w-full"
+        alt="YAP Chat Logo"
+        width={400}
+        height={100}
+        className="px-8 mt-6 mx-auto w-full h-auto aspect-[4/1] object-contain"
+        loading="eager"
       />
       <CardHeader>
         <CardTitle>Registro en tu cuenta</CardTitle>
@@ -92,6 +95,8 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
               })}
               type="text"
               id="name"
+              aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? "name-error" : undefined}
               className={
                 errors.name
                   ? "border-red-300 focus-visible:ring-red-200 focus-visible:border-red-300"
@@ -99,7 +104,7 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
               }
             />
             {errors.name && (
-              <p className="text-sm text-red-500">{errors.name.message}</p>
+              <p id="name-error" className="text-sm text-red-500">{errors.name.message}</p>
             )}
           </div>
           <div className="grid gap-1">
@@ -114,6 +119,8 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
               })}
               type="text"
               id="email"
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? "email-error" : undefined}
               className={
                 errors.email
                   ? "border-red-300 focus-visible:ring-red-200 focus-visible:border-red-300"
@@ -121,7 +128,7 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
               }
             />
             {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
+              <p id="email-error" className="text-sm text-red-500">{errors.email.message}</p>
             )}
           </div>
           <div className="grid gap-1">
@@ -135,6 +142,8 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
               })}
               type="password"
               id="password"
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? "password-error" : undefined}
               className={
                 errors.password
                   ? "border-red-300 focus-visible:ring-red-200 focus-visible:border-red-300"
@@ -142,7 +151,7 @@ function RegisterForm({ isFlipped }: RegisterFormProps) {
               }
             />
             {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
+              <p id="password-error" className="text-sm text-red-500">{errors.password.message}</p>
             )}
           </div>
         </form>
