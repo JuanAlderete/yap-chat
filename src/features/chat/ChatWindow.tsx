@@ -11,6 +11,7 @@ import { ArrowLeft, Loader2, Send } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { socketService } from "@/services/socket.service";
+import { useMemo } from "react";
 
 const EMPTY_MESSAGES: Message[] = [];
 
@@ -31,11 +32,12 @@ function ChatWindow() {
   const conversations = useChatStore((s) => s.conversations);
   const allMessages = useChatStore((s) => s.messages);
 
-  // Derive messages and conversation from store state using stable references
   const conversationMessages = (conversationId ? allMessages[conversationId] : undefined) ?? EMPTY_MESSAGES;
   const conversation = conversations.find((c) => c._id === conversationId);
 
   const currentUser = useAuthStore((state) => state.user);
+  const currentUserId = currentUser?._id;
+
   const [messageInput, setMessageInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isSending, setIsSending] = useState(false);
@@ -94,13 +96,13 @@ function ChatWindow() {
 
     const handleTypingStart = ({ userId }: { userId: string }) => {
       console.log("[Socket] typing:start from:", userId);
-      if (userId !== currentUser?._id) {
+      if (userId !== currentUserId) {
         setIsOtherUserTyping(true);
       }
     };
 
     const handleTypingStop = ({ userId }: { userId: string }) => {
-      if (userId !== currentUser?._id) {
+      if (userId !== currentUserId) {
         setIsOtherUserTyping(false);
       }
     };
@@ -116,17 +118,19 @@ function ChatWindow() {
       socketService.offChatListeners();
       setIsOtherUserTyping(false);
     };
-  }, [conversationId, currentUser?._id, addMessage, replaceMessage, removeMessage]);
+  }, [conversationId, currentUserId, addMessage, replaceMessage, removeMessage]);
 
   // ── Auto-scroll ────────────────────────────────────────────────────────────
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversationMessages]);
 
-  const sortedMessages = [...conversationMessages].sort(
-    (a, b) =>
-      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-  );
+  const sortedMessages = useMemo(() => {
+    return [...conversationMessages].sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+  }, [conversationMessages]);
 
   // ── Typing indicator ───────────────────────────────────────────────────────
   const handleInputChange = useCallback(
@@ -153,7 +157,6 @@ function ChatWindow() {
 
     setIsSending(true);
 
-    // Stop typing indicator immediately
     if (conversationId) {
       socketService.emitTypingStop(conversationId);
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
@@ -260,8 +263,8 @@ function ChatWindow() {
             {sortedMessages.map((message: Message) => {
               const isOwnMessage =
                 typeof message.senderId === "string"
-                  ? message.senderId === currentUser?._id
-                  : message.senderId._id === currentUser?._id;
+                  ? message.senderId === currentUserId
+                  : message.senderId._id === currentUserId;
 
               return (
                 <div
